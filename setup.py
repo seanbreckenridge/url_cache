@@ -1,7 +1,12 @@
 import io
 from setuptools import setup, find_packages
 
-requirements = []
+requirements = [
+    "appdirs>=1.4.4",
+    "lassie>=0.11.7",
+    "readability-lxml>=0.8.1",
+    "logzero",
+]
 
 # Use the README.md content for the long description:
 with io.open('README.md', encoding='utf-8') as fo:
