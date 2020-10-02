@@ -5,6 +5,7 @@ requirements = [
     "appdirs>=1.4.4",
     "lassie>=0.11.7",
     "readability-lxml>=0.8.1",
+    "backoff>=1.10.0",
     "logzero",
 ]
 

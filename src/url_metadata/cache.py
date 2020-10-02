@@ -3,10 +3,12 @@ An hash-based, file system cache
 """
 
 import os
+import shutil
+import json
 from hashlib import md5
-from typing import Optional
+from typing import Optional, List
 from pathlib import Path
-from typing import List
+from functools import lru_cache
 
 from .model import Metadata
 
@@ -16,10 +18,16 @@ class DirCacheMiss(Exception):
 
 
 def subdirs(path: str) -> List[str]:
+    """
+    Returns a list of subdirectores (that exist) for a existing directory
+    """
     return [f.path for f in os.scandir(path) if f.is_dir()]
 
 
 def keyfile_matches_contents(key: str, path: str) -> bool:
+    """
+    Helper function to check if a file matches the key we're trying to find
+    """
     with open(path, "r") as f:
         contents = f.read()
     return contents == key
@@ -41,11 +49,10 @@ class DirCache:
 
     The input/key to the cache is a string, which is typically a URL.
     This stores the key at <target_dir>/key
-
     """
 
-    def __init__(self, loc: Path):
-        self.base = str(loc)
+    def __init__(self, loc: str):
+        self.base: str = loc
         os.makedirs(self.base, exist_ok=True)
 
     def get(self, key: str) -> str:
@@ -53,7 +60,7 @@ class DirCache:
         Recieves some string key as input.
         Returns the directory for that key if it exists, else raises DirCacheMiss
         """
-        base: str = self.base_dir(key)
+        base: str = self.base_dir_hashed_path(key)
         if not os.path.exists(base):
             raise DirCacheMiss("Base dir for hash doesn't exist: {}".format(base))
         # check if keyfile matches any of the existing directories
@@ -83,7 +90,7 @@ class DirCache:
         If a hash collision occurs (a different key already exists there), this creates
         a new directory, starting with 001, 002, 003
         """
-        base: str = self.base_dir(key)
+        base: str = self.base_dir_hashed_path(key)
         os.makedirs(base, exist_ok=True)
         # check if keyfile matches any of the existing directories
         for s in subdirs(base):
@@ -115,12 +122,25 @@ class DirCache:
         except DirCacheMiss:
             return False
 
-    def base_dir(self, key: str) -> str:
+    def delete(self, key: str) -> bool:
+        """
+        Deletes the corresponding directory for a key, if it exists
+        Returns True if something was deleted, else False
+        """
+        try:
+            kdir = self.get(key)
+            shutil.rmtree(kdir)
+            return True
+        except DirCacheMiss:
+            return False
+
+    @lru_cache(32)
+    def base_dir_hashed_path(self, key: str) -> str:
         """
         Recieves the key as input. Computes the corresponding base directory for the hash
 
         >>> d = DirCache('/tmp')
-        >>> d.base_dir("something")
+        >>> d.base_dir_hashed_path("something")
         '/tmp/4/3/7/b930db84b8079c2dd804a71936b5f'
         """
         md5_hash: str = self.__class__.hash_key(key)
@@ -139,39 +159,96 @@ class DirCache:
         return md5(key.encode()).hexdigest()
 
 
-class Index:
+class MetadataCache:
+    """
+    Interface to the underlying DirCache, which serializes/deserializes information
+    from the Metadata object into each individual file
+
+    Since this uses the URL as the key, it unquotes (https://docs.python.org/3/library/urllib.parse.html#urllib.parse.unquote)
+    and strips the URL to remove extra whitespace
+    """
+
+    _metadata_fp = "metadata.json"
+    _subtitles_fp = "subtitles.srt"
+    _html_fp = "summary.html"
+    _markdown_fp = "summary.md"
+    _timestamp_fp = "epoch_timestamp.txt"
+
     def __init__(self, data_dir: Path):
         self.data_dir: Path = data_dir
-
-    @staticmethod
-    def has_null_value(url: str) -> bool:
-        """
-        If the item isn't in cache, returns True
-        If the item is in cache, but it doesn't have any values (i.e. empty
-        json file and no srt data), then return True
-        else return False (this has data)
-        """
-        pass
+        self.cache = DirCache(str(self.data_dir))
 
     def get(self, url: str) -> Optional[Metadata]:
         """
         Get data for the 'url' from cache, or None
         """
-        pass
+        if not self.has(url):
+            return None
+        tdir: str = self.cache.get(url)
 
-    def exists(self, url: str) -> bool:
+        # TODO: read things from files!
+
+    def put(self, url: str, data: Metadata) -> str:
+        """
+        Replaces/puts the information from 'data' into the
+        corresponding directory given the url
+
+        Deletes previous cached information, if it exists for the URL
+        """
+
+        # delete
+        if self.has(url):
+            self.delete(url)
+
+        tdir: str = self.cache.put(url)
+
+        # if metadata was parsed
+        if data.info:
+            with open(os.path.join(tdir, self.__class__._metadata_fp), "w") as meta_f:
+                json.dump(data.info, meta_f)
+
+        # if this has the html summary from readability
+        if data.html_summary is not None:
+            with open(os.path.join(tdir, self.__class__._html_fp), "w") as content_f:
+                content_f.write(data.html_summary)
+
+        # if this has parsed markdown from pandoc
+        if data.markdown_summary is not None:
+            with open(os.path.join(tdir, self.__class__._markdown_fp), "w") as md_f:
+                md_f.write(data.markdown_summary)
+
+        # if this has subtitles
+        if data.subtitles is not None:
+            with open(os.path.join(tdir, self.__class__._subtitles_fp), "w") as sub_f:
+                sub_f.write(data.subtitles)
+
+        with open(os.path.join(tdir, self.__class__._timestamp_fp), "w") as tstamp_f:
+            tstamp_f.write(str(int(data.timestamp.timestamp())))
+
+        return tdir
+
+    def has(self, url: str) -> bool:
         """
         Returns true/false, signifying whether or not the information
         for this url is already cached
         """
-        return False
-
-    def put(self, url: str) -> None:
-        pass
+        return self.cache.exists(url)
 
     # not used but here as a library function, incase
     def delete(self, url: str) -> bool:
         """
         Returns true if item was deleted, false if it didn't exist
         """
+        return self.cache.delete(url)
+
+    def has_null_value(self, url: str) -> bool:
+        """
+        If the item isn't in cache, raises DirCacheMiss
+        If the item is in cache, but it doesn't have any values (i.e. empty
+        json file and no srt data), then return True
+        else return False (this has data)
+
+        meant to be used to 'retry' getting url metadata, incase none was retrieved
+        """
+        # TODO: implement? may not be needed
         pass

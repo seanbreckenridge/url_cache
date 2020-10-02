@@ -6,11 +6,7 @@ from url_metadata.cache import DirCache
 
 
 def test_dir_cache_chaining():
-    # create both
-    # make sure they exist
-    # delete the first
-    # see if second exists
-    d = tempfile.mkdtemp()
+    d: str = tempfile.mkdtemp()
     dd = DirCache(d)
     k = "key1"
     assert not dd.exists(k)
@@ -35,3 +31,17 @@ def test_dir_cache_chaining():
     # try to create 002, to make sure it works
     got_dir = dd.put(k)
     assert got_dir.rstrip("/").endswith("002")
+
+
+def test_delete():
+    # create and delete a key directory with DirCache, make sure
+    # items are deleted
+    d: str = tempfile.mkdtemp()
+    dd = DirCache(d)
+    k = "something"
+    assert not dd.exists(k)
+    got_dir = dd.put(k)
+    assert dd.exists(k) and os.path.isdir(got_dir)
+    assert dd.delete(k)
+    assert not dd.exists(k)
+    assert not os.path.exists(got_dir)

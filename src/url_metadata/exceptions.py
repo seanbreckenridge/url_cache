@@ -4,7 +4,7 @@ class URLMetadataException(Exception):
     pass
 
 
-class URLMetadataRequestError(Exception):
-    """Encountered a unrecoverable request error while requesting a URL"""
+class URLMetadataRequestException(Exception):
+    """Encountered a request error while requesting a URL"""
 
     pass
