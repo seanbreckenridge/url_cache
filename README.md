@@ -9,6 +9,8 @@ Supports:
 Planned:
 
 - basic metadata (title of page, other basic metadata from `<head>`? OpenGraph Info? Other stuff?
+- hash URL to store info in a local cache, items that have already been requested return info from local cache
+- basic CLI interface
 
 ## Installation
 
