@@ -1,0 +1,3 @@
+[submodule "src/url_metadata/yt_subs"]
+	path = src/url_metadata/yt_subs
+	url = https://github.com/seanbreckenridge/youtube_subtitles_downloader
