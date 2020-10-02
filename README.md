@@ -8,7 +8,8 @@ Supports:
 
 Planned:
 
-- basic metadata (title of page, other basic metadata from `<head>`? OpenGraph Info? Other stuff?
+- basic metadata - See [here](https://github.com/kapouer/url-inspector) for a good list of attributes.
+- [OpenGraph](https://opengraphprotocol.org/) interface
 - hash URL to store info in a local cache, items that have already been requested return info from local cache
 - basic CLI interface
 
