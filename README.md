@@ -2,7 +2,15 @@
 
 WORK IN PROGRESS
 
-An extendible CLI tool/library to download and cache Open Graph, generic metadata and URLs youtube subtitles.
+An extendible CLI tool/library to get more metadata about URLs.
+
+Supports:
+
+- Youtube subtitles
+
+Planned:
+
+- basic metadata (title of page, other basic metadata from `<head>`? OpenGraph Info? Other stuff?
 
 ## Installation
 

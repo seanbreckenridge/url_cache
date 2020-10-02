@@ -13,7 +13,7 @@ setup(
     url='https://github.com/seanbreckenridge/url_metadata',
     author='Sean Breckenridge',
     author_email='seanbrecke@gmail.com',
-    description=('''cache youtube, graphapi and generic metadata from URLs'''),
+    description=('''cache metadata from URLs'''),
     long_description=long_description,
     long_description_content_type='text/markdown',
     license='MIT',
