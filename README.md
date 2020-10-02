@@ -1,6 +1,6 @@
 WORK IN PROGRESS
 
-An CLI tool/library to get more metadata about URLs
+A cache which saves URL metadata and content
 
 Supports:
 
