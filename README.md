@@ -8,8 +8,7 @@ Supports:
 
 Planned:
 
-- basic metadata - See [here](https://github.com/kapouer/url-inspector) for a good list of attributes.
-- [OpenGraph](https://opengraphprotocol.org/) interface
+- basic metadata - Use [lassie](https://github.com/michaelhelmick/lassie) and [readability](https://github.com/buriy/python-readability)
 - hash URL to store info in a local cache, items that have already been requested return info from local cache
 - basic CLI interface
 
