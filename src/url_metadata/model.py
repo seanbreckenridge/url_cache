@@ -6,5 +6,5 @@ LassieMetadata = Dict[str, Any]
 
 @dataclass
 class Metadata:
-    info: LassieMetadata = {}
-    subtitles: Optional[str] = None
+    info: LassieMetadata
+    subtitles: Optional[str]

@@ -1,4 +1,5 @@
-from urllib.parse import urlparse, parse_qs
+from typing import Optional
+from urllib.parse import urlparse, parse_qs, ParseResult
 
 from .exceptions import URLMetadataException
 
@@ -47,9 +48,13 @@ def get_yt_video_id(url: str):
     if url.startswith(("youtu", "www")):
         url = "http://" + url
 
-    query = urlparse(url)
+    query: Optional[ParseResult] = urlparse(url)
 
-    if "youtube" in query.hostname:
+    if query is None:
+        raise URLMetadataException("Could not parse video id from {}".format(url))
+    if query.hostname is None or query.path is None:
+        raise URLMetadataException("Parsed query info from url {} is None".format(url))
+    elif "youtube" in query.hostname:
         if query.path == "/watch":
             return parse_qs(query.query)["v"][0]
         elif query.path.startswith(("/embed/", "/v/")):
