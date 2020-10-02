@@ -1,6 +1,6 @@
 WORK IN PROGRESS
 
-An extendible CLI tool/library to get more metadata about URLs.
+An CLI tool/library to get more metadata about URLs
 
 Supports:
 
