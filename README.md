@@ -1,5 +1,3 @@
-# url_metadata
-
 WORK IN PROGRESS
 
 An extendible CLI tool/library to get more metadata about URLs.
