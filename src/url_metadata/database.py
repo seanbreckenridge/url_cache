@@ -13,7 +13,7 @@ class Index:
         pass
 
     @staticmethod
-    def has_null_value(self, url: str) -> bool:
+    def has_null_value(url: str) -> bool:
         """
         If the item isn't in cache, returns True
         If the item is in cache, but it doesn't have any values (i.e. empty
