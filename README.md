@@ -83,3 +83,4 @@ You're free to delete any of the directories in the cache if you want, this does
 
 By default this waits 5 seconds between requests. Since all the info is cached, I use this by requesting all the info from one data source (e.g. my bookmarks, or videos I've watched recently) in a loop in the background, which saves all the information to my computer. The next time I do that same loop, it doesn't have to make any requests and it just grabs all the info from local cache.
 
+Originally created for [`HPI`](https://github.com/seanbreckenridge/HPI).
