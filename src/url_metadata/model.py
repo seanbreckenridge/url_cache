@@ -41,7 +41,7 @@ class Metadata:
         self.subtitles = subtitles or None
         self.timestamp = timestamp or datetime.now()
 
-    def to_dict(self) -> str:
+    def to_dict(self) -> Dict[str, Any]:
         return {
             "url": self.url,
             "info": self.info,

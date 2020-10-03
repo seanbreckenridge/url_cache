@@ -76,7 +76,7 @@ def list_keys(cache_dir: Path) -> List[Path]:
     """
     Helper function which returns the absolute path of all matched keyfiles
     """
-    return [p.absolute() for p in ucache.cache_dir.rglob("*/key")]
+    return [p.absolute() for p in cache_dir.rglob("*/key")]
 
 
 @main.command()
