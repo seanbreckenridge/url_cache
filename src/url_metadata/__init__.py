@@ -1,14 +1,11 @@
-# TODO: allow user to configure logging
-
 from .core import URLMetadataCache
 
-# if not customized at all, metadata is a very basic entrypoint
-# to this library.
-#
-# If you want to do anything else, better to import it elsewhere
-# and provide flags
-default_cache = URLMetadataCache()
+# uncustomized, basic entry point to the library
+default_cache = None
 
 
 def metadata(url):
+    global default_cache
+    if default_cache is None:
+        default_cache = URLMetadataCache()
     return default_cache.get(url)
