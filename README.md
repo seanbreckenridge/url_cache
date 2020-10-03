@@ -50,9 +50,57 @@ The core functionality of requesting/parsing/caching URLs is complete.
 
 ---
 
-Usage:
+### Usage:
 
-TODO: add python library usage
+This can be configured further by using the `url_metadata.URLMetadataCache` class:
+
+```python
+   URLMetadataCache(loglevel: int = logging.WARNING,
+                    subtitle_language: str = 'en',
+                    sleep_time: int = 5,
+                    cache_dir: Union[str, pathlib.Path, NoneType] = None)
+       """
+       Main interface to the library
+
+       Supply 'cache_dir' to overwrite the default location.
+       """
+
+   get(self, url: str) -> url_metadata.model.Metadata
+       """
+       Gets metadata/summary for a URL.
+       Save the parsed information in a local data directory
+       If the URL already has cached data locally, returns that instead.
+       """
+
+   in_cache(self, url: str) -> bool
+       """
+       Returns True if the URL already has cached information
+       """
+
+   request_data(self, url: str) -> url_metadata.model.Metadata
+       """
+       Given a URL:
+
+       If this is a youtube URL, this requests youtube subtitles
+       Uses lassie to grab metadata
+       Parses the HTML text with readablity
+       uses bs4 to parse that text into a plaintext summary
+       """
+```
+
+For example:
+
+```python
+import logging
+from url_metadata import URLMetadataCache
+
+# make requests every 2 seconds
+# debug logs
+# save to a folder in my home directory
+cache = URLMetadataCache(loglevel=logging.DEBUG, sleep_time=2, cache_dir="~/mydata")
+c = cache.get("https://github.com/seanbreckenridge/url_metadata")
+print(c.info["description"])
+```
 
 ---
 

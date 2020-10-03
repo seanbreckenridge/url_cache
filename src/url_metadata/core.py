@@ -1,8 +1,9 @@
 """
-Core funcitonality for url_metadata, switches on the URLs to request different types of information
+Core functionality for url_metadata, switches on the URLs to request different types of information
 saves that to cache. If something has already been requested, returns it from cache.
 """
 
+import os
 import logging
 from time import sleep
 from pathlib import Path
@@ -10,16 +11,15 @@ from typing import Optional, Union
 
 import backoff
 import readability
-from bs4 import BeautifulSoup
+from logzero import setup_logger, formatter
 from lassie import Lassie, LassieError
-from appdirs import user_data_dir
+from appdirs import user_data_dir, user_log_dir
 from requests import Session, Response
 
-from .log import setup
 from .exceptions import URLMetadataException, URLMetadataRequestException
 from .cache import MetadataCache
 from .model import Metadata
-from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url
+from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url, html_get_text
 from .youtube import download_subtitles, get_yt_video_id, YoutubeException
 
 DEFAULT_SUBTITLE_LANGUAGE = "en"
@@ -86,44 +86,64 @@ class URLMetadataCache:
             self.cache_dir.mkdir()
         self.metadata_cache = MetadataCache(self.cache_dir)
 
-        # TODO: setup rotating logfile in user_cache_dir
-        self.logger: logging.Logger = setup(loglevel)
+        # setup logging
+        self.logger = setup_logger(
+            name="url_metadata",
+            level=loglevel,
+            logfile=self.logpath,
+            maxBytes=1e7,
+            formatter=formatter(
+                "{start}[%(levelname)-7s %(asctime)s %(name)s %(filename)s:%(lineno)d]{end} %(message)s"
+            ),
+        )
 
         self.subtitle_language: str = subtitle_language
         self.sleep_time: int = sleep_time
 
         ll: Lassie = Lassie()
         # hackery with a requests.Session to save the most recent request object
-        ll.client = SaveSession(cb_func=self.save_http_response)
+        ll.client = SaveSession(cb_func=self._save_http_response)
         self.lassie: Lassie = ll
 
         # default 'last response received' to None
         self._response: Optional[Response] = None
 
-    def save_http_response(self, resp: Response) -> None:
+    def get(self, url: str) -> Metadata:
         """
-        callback function to save the most recent request that lassie made
+        Gets metadata/summary for a URL.
+        Save the parsed information in a local data directory
+        If the URL already has cached data locally, returns that instead.
         """
-        # do I need to save multiple? lassie makes a HEAD
-        # request to get the content type, and then another
-        # to get the content, so this should access the
-        # response I want; with the main page content
-        self._response = resp
-
-    def get(self, url: str) -> Optional[Metadata]:
         uurl: str = clean_url(url)
         if not self.in_cache(uurl):
             data: Metadata = self.request_data(uurl)
             self.metadata_cache.put(uurl, data)
             return data
         # returns None if not present
-        return self.metadata_cache.get(uurl)
+        fdata: Optional[Metadata] = self.metadata_cache.get(uurl)
+        if fdata is None:
+            raise URLMetadataException(
+                f"Failure retrieving information from cache for {url}"
+            )
+        else:
+            return fdata
 
     def in_cache(self, url: str) -> bool:
+        """Returns True if the URL already has cached information"""
         uurl: str = clean_url(url)
         return self.metadata_cache.has(uurl)
 
     def request_data(self, url: str) -> Metadata:
+        """
+        Given a URL:
+
+        If this is a youtube URL, this requests youtube subtitles
+        Uses lassie to grab metadata
+        Parses the HTML text with readablity
+        uses bs4 to parse that text into a plaintext summary
+
+        returns all the requested/parsed info as a models.Metdata object
+        """
         uurl: str = clean_url(url)
         metadata = Metadata(url=uurl)
         # if this matches a youtube url, download subtitles
@@ -177,17 +197,7 @@ class URLMetadataCache:
                 )
 
         if metadata.html_summary is not None:
-            # modified from https://stackoverflow.com/a/24618186/9348376
-            soup = BeautifulSoup(metadata.html_summary, features="html.parser")
-            # kill all script and style elements
-            for script in soup(["script", "style"]):
-                script.extract()  # rip it out
-            # break into lines and remove leading and trailing space on each
-            lines = (line.strip() for line in soup.get_text().splitlines())
-            # break multi-headlines into a line each
-            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-            # drop blank lines
-            metadata.text_summary = "\n".join(chunk for chunk in chunks if chunk)
+            metadata.text_summary = html_get_text(metadata.html_summary)
         return metadata
 
     @backoff.on_exception(
@@ -204,3 +214,20 @@ class URLMetadataCache:
                 "Received 429 for URL {}, waiting to retry...".format(url)
             )
         return None
+
+    @property
+    def logpath(self) -> str:
+        """Returns the path to the url_metadata logfile"""
+        f = os.path.join(user_log_dir("url_metadata"), "request.log")
+        os.makedirs(os.path.dirname(f), exist_ok=True)
+        return f
+
+    def _save_http_response(self, resp: Response) -> None:
+        """
+        callback function to save the most recent request that lassie made
+        """
+        # do I need to save multiple? lassie makes a HEAD
+        # request to get the content type, and then another
+        # to get the content, so this should access the
+        # response I want; with the main page content
+        self._response = resp

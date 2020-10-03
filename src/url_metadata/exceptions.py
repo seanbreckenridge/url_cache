@@ -1,5 +1,5 @@
 class URLMetadataException(Exception):
-    """Generic exception for the url_metadata package"""
+    """Generic exception for url_metadata"""
 
     pass
 

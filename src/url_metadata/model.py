@@ -5,6 +5,17 @@ from dataclasses import dataclass
 
 @dataclass(init=False)
 class Metadata:
+    """
+    Represents all possible data for a URL
+
+    URL
+    Basic Info (description, images, page metadata)
+    HTML Summary
+    Text Summary
+    Subtitles (from youtube)
+    Timestamp (when this information was scraped)
+    """
+
     info: Dict[str, Any]
     url: str
     html_summary: Optional[str]

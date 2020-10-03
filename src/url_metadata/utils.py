@@ -2,6 +2,7 @@ import backoff
 import warnings
 
 from urllib.parse import unquote
+from bs4 import BeautifulSoup
 from pathlib import Path
 from typing import Union, Iterator
 
@@ -12,7 +13,7 @@ def normalize_path(p: Union[str, Path]) -> Path:
     elif isinstance(p, str):
         return Path(p).expanduser().absolute()
     else:
-        raise TypeError("Expected 'str' or 'pathlib.Path', recieved {}".format(type(p)))
+        raise TypeError("Expected 'str' or 'pathlib.Path', received {}".format(type(p)))
 
 
 def fibo_backoff() -> Iterator[int]:
@@ -34,4 +35,25 @@ def backoff_warn(details):
 
 
 def clean_url(url: str) -> str:
+    """
+    unquotes and removes whitespace from URLs
+    https://docs.python.org/3/library/urllib.parse.html#urllib.parse.unquote
+    """
     return unquote(url).strip()
+
+
+def html_get_text(html_text: str) -> str:
+    """
+    Extracts text content from HTML text
+    """
+    # modified from https://stackoverflow.com/a/24618186/9348376
+    soup = BeautifulSoup(html_text, features="html.parser")
+    # kill all script and style elements
+    for script in soup(["script", "style"]):
+        script.extract()  # rip it out
+    # break into lines and remove leading and trailing space on each
+    lines = (line.strip() for line in soup.get_text().splitlines())
+    # break multi-headlines into a line each
+    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+    # drop blank lines
+    return "\n".join(chunk for chunk in chunks if chunk)

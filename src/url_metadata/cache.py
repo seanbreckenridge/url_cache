@@ -42,7 +42,7 @@ def keyfile_matches_contents(key: str, path: str) -> bool:
 # It stores the corresponding URL as a 'key' file when inserted,
 # so it can do chaining of sorts if there are hash collisions
 # By no means is this an 'optimal' caching strategy, but it provides
-# the benifit that there is no index, with relatively fast lookup (using MD5)
+# the benefit that there is no index, with relatively fast lookup (using MD5)
 # Directories can be deleted by the user whenever they'd like without issue.
 class DirCache:
     """
@@ -58,7 +58,7 @@ class DirCache:
 
     def get(self, key: str) -> str:
         """
-        Recieves some string key as input.
+        Receives some string key as input.
         Returns the directory for that key if it exists, else raises DirCacheMiss
         """
         base: str = self.base_dir_hashed_path(key)
@@ -73,7 +73,7 @@ class DirCache:
 
     def put(self, key: str) -> str:
         """
-        Recieves a key to create a cache directory for.
+        Receives a key to create a cache directory for.
         Creates a directory by calculating the MD5 hash, returns the path to the corresponding
         directory. Expects the directory to only be used to store files, not directories.
 
@@ -138,7 +138,7 @@ class DirCache:
     @lru_cache(32)
     def base_dir_hashed_path(self, key: str) -> str:
         """
-        Recieves the key as input. Computes the corresponding base directory for the hash
+        Receives the key as input. Computes the corresponding base directory for the hash
 
         >>> d = DirCache('/tmp')
         >>> d.base_dir_hashed_path("something")
