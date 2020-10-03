@@ -1,3 +1,5 @@
+[![PyPi version](https://img.shields.io/pypi/v/url_metadata.svg)](https://pypi.python.org/pypi/url_metadata) [![Python3.7|Python 3.8](https://img.shields.io/pypi/pyversions/url_metadata.svg)](https://pypi.python.org/pypi/url_metadata) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
 A cache which saves URL metadata and content
 
 This is meant to provide more context to any of my tools which use URLs. If I [watched some youtube video](https://github.com/seanbreckenridge/mpv-sockets/blob/master/DAEMON.md) and I have a URL, I'd like to have the subtitles for it, so I can do a text-search over all the videos I've watched. If I [read an article](https://github.com/seanbreckenridge/ffexport), I want the article text! This requests, parses and abstracts away that data for me locally, so I can just do:
