@@ -22,6 +22,7 @@ from .model import Metadata
 from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url, html_get_text
 from .youtube import download_subtitles, get_yt_video_id, YoutubeException
 
+DEFAULT_LOGLEVEL = logging.WARNING
 DEFAULT_SUBTITLE_LANGUAGE = "en"
 DEFAULT_SLEEP_TIME = 5
 
@@ -53,7 +54,7 @@ class SaveSession(Session):
 class URLMetadataCache:
     def __init__(
         self,
-        loglevel: int = logging.WARNING,
+        loglevel: int = DEFAULT_LOGLEVEL,
         subtitle_language: str = DEFAULT_SUBTITLE_LANGUAGE,
         sleep_time: int = DEFAULT_SLEEP_TIME,
         cache_dir: Optional[Union[str, Path]] = None,

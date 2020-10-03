@@ -7,6 +7,7 @@ requirements = [
     "readability-lxml>=0.8.1",
     "backoff>=1.10.0",
     "beautifulsoup4>=4.9.2",
+    "click>=7.1.2",
     "logzero",
 ]
 
@@ -29,6 +30,11 @@ setup(
     package_dir={"": "src"},
     install_requires=requirements,
     keywords="url cache data youtube subtitles",
+    entry_points={
+        "console_scripts": [
+            "url_metadata = url_metadata.__main__:main",
+        ]
+    },
     classifiers=[
         "OSI Approved :: Apache Software License",
         "License :: OSI Approved :: MIT License",

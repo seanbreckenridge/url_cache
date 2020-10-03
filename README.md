@@ -39,17 +39,6 @@ This uses:
 
 ---
 
-Other planned things:
-
-- CLI interface to cache URLs, extract filenames, types of files; provide an interface to integrate with other shell tools.
-- allow user to configure subtitle language, loglevel, etc.
-- add examples for library/shell usage
-- other data providers?
-
-The core functionality of requesting/parsing/caching URLs is complete.
-
----
-
 ### Usage:
 
 This can be configured further by using the `url_metadata.URLMetadataCache` class:
@@ -104,9 +93,52 @@ print(c.info["description"])
 
 ---
 
-Searching:
+The CLI interface lets you specify much the same:
 
-TODO: add CLI/external usage
+```
+$ url_metadata
+Usage: url_metadata [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --cache-dir PATH          Override default directory cache location
+  --debug / --no-debug      Increase log verbosity
+  --sleep-time INTEGER      How long to sleep between requests
+  --subtitle-language TEXT  Subtitle language for Youtube captions
+  --help                    Show this message and exit.
+
+Commands:
+  cachedir  Prints the location of the local cache directory
+  export    Print all cached information as JSON
+  get       Get information for one or more URLs.
+  list      List all cached URLs
+```
+### CLI Examples
+
+The `get` command emits `JSON`, so it could with other tools (e.g. [`jq`](https://stedolan.github.io/jq/)) used like:
+
+```shell
+$ url_metadata get "https://click.palletsprojects.com/en/7.x/arguments/" \
+    | jq -r '.[] | .text_summary' | head -n5
+Arguments
+Arguments work similarly to options but are positional.
+They also only support a subset of the features of options due to their
+syntactical nature. Click will also not attempt to document arguments for
+you and wants you to document them manually
+```
+
+```shell
+$ url_metadata export | jq -r '.[] | .info | .title'
+seanbreckenridge/youtube_subtitles_downloader
+Arguments — Click Documentation (7.x)
+```
+
+```shell
+$ url_metadata list --location
+/home/sean/.local/share/url_metadata/data/b/a/a/c8e05501857a3c7d2d1a94071c68e/000
+/home/sean/.local/share/url_metadata/data/9/4/4/1c380792a3d62302e1137850d177b/000
+```
+
+Accessible through the `url_metadata` script and `python3 -m url_metadata`
 
 ---
 

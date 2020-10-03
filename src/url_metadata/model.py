@@ -40,3 +40,13 @@ class Metadata:
         self.text_summary = text_summary or None
         self.subtitles = subtitles or None
         self.timestamp = timestamp or datetime.now()
+
+    def to_dict(self) -> str:
+        return {
+            "url": self.url,
+            "info": self.info,
+            "html_summary": self.html_summary,
+            "text_summary": self.text_summary,
+            "subtitles": self.subtitles,
+            "timestamp": int(self.timestamp.timestamp()),
+        }
