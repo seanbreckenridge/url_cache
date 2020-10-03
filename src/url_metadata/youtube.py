@@ -3,11 +3,7 @@ from urllib.parse import urlparse, parse_qs, ParseResult
 
 from .exceptions import URLMetadataException
 
-from .yt_subs.subtitles_downloader import (
-    TrackNotFoundException,
-    VideoParsingException,
-    download_subs,
-)
+from .yt_subs.subtitles_downloader import TrackNotFoundException, VideoParsingException, download_subs # type: ignore
 
 
 class YoutubeException(Exception):
