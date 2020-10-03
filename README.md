@@ -176,6 +176,7 @@ Originally created for [`HPI`](https://github.com/seanbreckenridge/HPI).
 
     git clone 'https://github.com/seanbreckenridge/url_metadata'
     cd ./url_metadata
+    git submodule update --init
     pip install '.[testing]'
     mypy ./src/url_metadata/
     pytest
