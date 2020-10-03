@@ -63,3 +63,4 @@ def get_yt_video_id(url: str):
         return query.path[1:]
     else:
         raise URLMetadataException("Could not parse video id from {}".format(url))
+

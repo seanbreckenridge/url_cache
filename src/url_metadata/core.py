@@ -18,7 +18,7 @@ from .log import setup
 from .exceptions import URLMetadataException, URLMetadataRequestException
 from .cache import MetadataCache
 from .model import Metadata
-from .utils import _normalize, fibo_backoff, backoff_warn, clean_url
+from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url
 from .youtube import download_subtitles, get_yt_video_id, YoutubeException
 
 DEFAULT_SUBTITLE_LANGUAGE = "en"
@@ -26,6 +26,13 @@ DEFAULT_SLEEP_TIME = 5
 
 
 class SaveSession(Session):
+    """
+    A subclass of requests.Session which runs a callback function
+    after each request.
+
+    Allows me to expose the request objects after requests using lassie
+    """
+
     def __init__(self, **kwargs):
         """
         cb_func: A callback function which saves the response
@@ -50,11 +57,16 @@ class URLMetadataCache:
         sleep_time: int = DEFAULT_SLEEP_TIME,
         cache_dir: Optional[Union[str, Path]] = None,
     ):
+        """
+        Main interface to the library
+
+        Supply 'cache_dir' to overwrite the default location.
+        """
 
         # handle cache dir
         cdir: Optional[Path] = None
         if cache_dir is not None:
-            cdir = _normalize(cache_dir)
+            cdir = normalize_path(cache_dir)
         else:
             cdir = Path(user_data_dir("url_metadata"))
 
@@ -94,7 +106,7 @@ class URLMetadataCache:
         # do I need to save multiple? lassie makes a HEAD
         # request to get the content type, and then another
         # to get the content, so this should access the
-        # response with the content
+        # response I want; with the main page content
         self._response = resp
 
     def get(self, url: str) -> Metadata:
@@ -111,10 +123,14 @@ class URLMetadataCache:
         return self.metadata_cache.has(uurl)
 
     def request_data(self, url: str) -> Metadata:
-        metadata = Metadata()
+        metadata = Metadata(url=url)
         # if this matches a youtube url, download subtitles
         try:
             yt_video_id: str = get_yt_video_id(url)
+            # I think this is dangerous to do, might cause URL mismatches
+            # on the other hand, it causes duplicate downloads if GET info
+            # present in the query
+            # url = "https://www.youtube.com/watch?v={}".format(yt_video_id)
             try:
                 self.logger.debug(
                     "Downloading subtitles for Youtube ID: {}".format(yt_video_id)
@@ -145,10 +161,9 @@ class URLMetadataCache:
         # use readability lib to parse self._response.text
         # if we're at this point, that should always be the latest
         # response, see https://github.com/michaelhelmick/lassie/blob/dd525e6243a989f083534921a1a1206931e608ec/lassie/core.py#L244-L266
-        if self._response is not None:
+        if bool(metadata.info) and self._response is not None and self._response.text.strip():
             if self._response.status_code < 400:
                 doc = readability.Document(self._response.text)
-                metadata.html_title = doc.title()
                 metadata.html_summary = doc.summary()
             else:
                 self.logger.warning(

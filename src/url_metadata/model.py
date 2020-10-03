@@ -8,6 +8,7 @@ LassieMetadata = Dict[str, Any]
 @dataclass(init=False)
 class Metadata:
     info: LassieMetadata
+    url: str
     html_summary: Optional[str]
     markdown_summary: Optional[str]
     # TODO: better representation in memory, for the .srt file?
@@ -16,6 +17,7 @@ class Metadata:
 
     def __init__(
         self,
+        url: str,
         info: Optional[Dict[str, Any]] = None,
         html_summary: Optional[str] = None,
         markdown_summary: Optional[str] = None,
@@ -24,6 +26,7 @@ class Metadata:
     ):
 
         self.info = info or {}
+        self.url = url
         self.html_summary = html_summary or None
         self.markdown_summary = markdown_summary or None
         self.subtitles = subtitles or None

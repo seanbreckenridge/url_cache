@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Union, Iterator
 
 
-def _normalize(p: Union[str, Path]) -> Path:
+def normalize_path(p: Union[str, Path]) -> Path:
     if isinstance(p, Path):
         return p
     elif isinstance(p, str):

@@ -163,9 +163,6 @@ class MetadataCache:
     """
     Interface to the underlying DirCache, which serializes/deserializes information
     from the Metadata object into each individual file
-
-    Since this uses the URL as the key, it unquotes (https://docs.python.org/3/library/urllib.parse.html#urllib.parse.unquote)
-    and strips the URL to remove extra whitespace
     """
 
     _metadata_fp = "metadata.json"

@@ -60,4 +60,3 @@ This stores all of this information as individual files in a cache directory (us
 
 You're free to delete any of the directories in the cache if you want, this doesn't maintain a strict index, it uses a hash of the URL and then searches for a matching `key` file. See comments [here](https://github.com/seanbreckenridge/url_metadata/blob/master/src/url_metadata/cache.py) for implementation details.
 
-
