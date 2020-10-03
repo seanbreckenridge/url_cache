@@ -46,10 +46,9 @@ In Python, this can be configured by using the `url_metadata.URLMetadataCache` c
    URLMetadataCache(loglevel: int = logging.WARNING,
                     subtitle_language: str = 'en',
                     sleep_time: int = 5,
-                    cache_dir: Union[str, pathlib.Path, NoneType] = None)
+                    cache_dir: Union[str, pathlib.Path, NoneType] = None) -> url_metadata.URLMetadataCache:
        """
        Main interface to the library
-
        Supply 'cache_dir' to overwrite the default location.
        """
 
