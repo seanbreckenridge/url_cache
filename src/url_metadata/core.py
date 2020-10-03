@@ -149,7 +149,7 @@ class URLMetadataCache:
         metadata = Metadata(url=uurl)
         # if this matches a youtube url, download subtitles
         try:
-            yt_video_id: str = get_yt_video_id(uurl)
+            yt_video_id: str = get_yt_video_id(uurl)  # can raise URLMetadataException
             # I think this is dangerous to do, might cause URL mismatches
             # on the other hand, it causes duplicate downloads if GET info
             # present in the query
@@ -161,9 +161,11 @@ class URLMetadataCache:
                 metadata.subtitles = download_subtitles(
                     yt_video_id, self.subtitle_language
                 )
-                sleep(self.sleep_time)
             except YoutubeException as ye:
                 self.logger.debug(str(ye))
+            # sleep even if it failed to parse, still made the request to youtube
+            # won't sleep if url doesn't match youtube
+            sleep(self.sleep_time)
         except URLMetadataException:
             # don't log here, very common failure for the URL
             # to not be parsable as a Youtube URL
