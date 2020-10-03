@@ -21,7 +21,7 @@ setup(
     url="https://github.com/seanbreckenridge/url_metadata",
     author="Sean Breckenridge",
     author_email="seanbrecke@gmail.com",
-    description=("""A cache which saves URL metadata and content"""),
+    description=("""A cache which saves URL metadata and summarizes content"""),
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="http://www.apache.org/licenses/LICENSE-2.0",
