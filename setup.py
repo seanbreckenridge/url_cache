@@ -21,7 +21,7 @@ setup(
     url="https://github.com/seanbreckenridge/url_metadata",
     author="Sean Breckenridge",
     author_email="seanbrecke@gmail.com",
-    description=("""cache metadata from URLs"""),
+    description=("""A cache which saves URL metadata and content"""),
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="http://www.apache.org/licenses/LICENSE-2.0",
@@ -29,7 +29,7 @@ setup(
     zip_safe=False,
     package_dir={"": "src"},
     install_requires=requirements,
-    keywords="url cache data youtube subtitles",
+    keywords="url cache metadata youtube subtitles",
     entry_points={
         "console_scripts": [
             "url_metadata = url_metadata.__main__:main",
