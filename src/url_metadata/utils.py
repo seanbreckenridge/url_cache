@@ -1,10 +1,10 @@
-import backoff
 import warnings
-
 from urllib.parse import unquote
-from bs4 import BeautifulSoup
 from pathlib import Path
 from typing import Union, Iterator
+
+import backoff  # type: ignore
+from bs4 import BeautifulSoup  # type: ignore
 
 
 def normalize_path(p: Union[str, Path]) -> Path:

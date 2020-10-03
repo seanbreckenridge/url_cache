@@ -9,11 +9,11 @@ from time import sleep
 from pathlib import Path
 from typing import Optional, Union
 
-import backoff
-import readability
-from logzero import setup_logger, formatter
-from lassie import Lassie, LassieError
-from appdirs import user_data_dir, user_log_dir
+import backoff  # type: ignore
+import readability  # type: ignore
+from logzero import setup_logger, formatter  # type: ignore
+from lassie import Lassie, LassieError  # type: ignore
+from appdirs import user_data_dir, user_log_dir  # type: ignore
 from requests import Session, Response
 
 from .exceptions import URLMetadataException, URLMetadataRequestException

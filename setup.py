@@ -17,7 +17,7 @@ with io.open("README.md", encoding="utf-8") as fo:
 
 setup(
     name="url_metadata",
-    version="0.1.1",
+    version="0.1.2",
     url="https://github.com/seanbreckenridge/url_metadata",
     author="Sean Breckenridge",
     author_email="seanbrecke@gmail.com",
@@ -30,9 +30,17 @@ setup(
     package_dir={"": "src"},
     install_requires=requirements,
     keywords="url cache metadata youtube subtitles",
+    test_suite="tests",
     entry_points={
         "console_scripts": [
             "url_metadata = url_metadata.__main__:main",
+        ]
+    },
+    extras_require={
+        "testing": [
+            "pytest",
+            "mypy",
+            "vcrpy",
         ]
     },
     classifiers=[
