@@ -5,6 +5,7 @@ An hash-based, file system cache
 import os
 import shutil
 import json
+from datetime import datetime, timezone
 from hashlib import md5
 from typing import Optional, List
 from pathlib import Path
@@ -171,9 +172,32 @@ class MetadataCache:
     _markdown_fp = "summary.md"
     _timestamp_fp = "epoch_timestamp.txt"
 
+    _handler_map = None
+
     def __init__(self, data_dir: Path):
         self.data_dir: Path = data_dir
         self.cache = DirCache(str(self.data_dir))
+
+    @classmethod
+    def _handler(cls):
+        if cls._handler_map is None:
+            cls._handler_map = {"metadata": cls._metadata_fp,
+            "subtitles": cls._subtitles_fp,
+            "html": cls._html_fp,
+            "markdown": cls._markdown_fp,
+            "timestamp": cls._timestamp_fp}
+        return cls._handler_map
+
+    # helper to get a metadata file
+    @classmethod
+    def _path(cls, base: str, metadata_filename: str) -> Path:
+        """
+        >>> str(MetadataCache._path("/tmp/something", "html"))
+        '/tmp/something/summary.html'
+        """
+        # raises keyerror on incorrect usage
+        part: str = cls._handler()[metadata_filename]
+        return Path(base) / part
 
     def get(self, url: str) -> Optional[Metadata]:
         """
@@ -181,9 +205,33 @@ class MetadataCache:
         """
         if not self.has(url):
             return None
-        tdir: str = self.cache.get(url)
 
-        # TODO: read things from files!
+        tdir: str = self.cache.get(url)
+        metadata = Metadata(url=url)
+
+        cl = self.__class__
+
+        mpath: Path = cl._path(tdir, "metadata")
+        if mpath.exists():
+            metadata.info = json.loads(mpath.read_text())
+
+        htmlpath: Path = cl._path(tdir, "html")
+        if htmlpath.exists():
+            metadata.html_summary = htmlpath.read_text()
+
+        mdpath: Path = cl._path(tdir, "markdown")
+        if mdpath.exists():
+            metadata.markdown_summary = mdpath.read_text()
+
+        subpath: Path = cl._path(tdir, "subtitles")
+        if subpath.exists():
+            metadata.subtitles = subpath.read_text()
+
+        tspath: Path = cl._path(tdir, "timestamp")
+        if tspath.exists():
+            metadata.timestamp = datetime.fromtimestamp(int(tspath.read_text().strip()), tz=timezone.utc)
+
+        return metadata
 
     def put(self, url: str, data: Metadata) -> str:
         """
@@ -199,27 +247,29 @@ class MetadataCache:
 
         tdir: str = self.cache.put(url)
 
+        cl = self.__class__
+
         # if metadata was parsed
         if data.info:
-            with open(os.path.join(tdir, self.__class__._metadata_fp), "w") as meta_f:
+            with cl._path(tdir, "metadata").open("w") as meta_f:
                 json.dump(data.info, meta_f)
 
         # if this has the html summary from readability
         if data.html_summary is not None:
-            with open(os.path.join(tdir, self.__class__._html_fp), "w") as content_f:
+            with cl._path(tdir, "html").open("w") as content_f:
                 content_f.write(data.html_summary)
 
         # if this has parsed markdown from pandoc
         if data.markdown_summary is not None:
-            with open(os.path.join(tdir, self.__class__._markdown_fp), "w") as md_f:
+            with cl._path(tdir, "markdown").open("w") as md_f:
                 md_f.write(data.markdown_summary)
 
         # if this has subtitles
         if data.subtitles is not None:
-            with open(os.path.join(tdir, self.__class__._subtitles_fp), "w") as sub_f:
+            with cl._path(tdir, "subtitles").open("w") as sub_f:
                 sub_f.write(data.subtitles)
 
-        with open(os.path.join(tdir, self.__class__._timestamp_fp), "w") as tstamp_f:
+        with cl._path(tdir, "timestamp").open("w") as tstamp_f:
             tstamp_f.write(str(int(data.timestamp.timestamp())))
 
         return tdir
