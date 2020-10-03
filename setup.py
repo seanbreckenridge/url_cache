@@ -17,7 +17,7 @@ with io.open("README.md", encoding="utf-8") as fo:
 
 setup(
     name="url_metadata",
-    version="0.1.0",
+    version="0.1.1",
     url="https://github.com/seanbreckenridge/url_metadata",
     author="Sean Breckenridge",
     author_email="seanbrecke@gmail.com",
@@ -39,7 +39,6 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
