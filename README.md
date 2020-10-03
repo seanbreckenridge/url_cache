@@ -20,11 +20,13 @@ If I ever request the same URL again, that info is saved in a local directory ca
 
 ---
 
-Other planned features:
+Other planned things:
 
 - CLI interface to cache URLs, extract filenames, types of files; provide an interface to integrate with other shell tools.
 - allow user to configure subtitle language, loglevel, etc.
--
+- add examples for library/shell usage
+
+The core functionality of requesting/parsing/caching URLs is complete.
 
 ---
 
