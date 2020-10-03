@@ -6,6 +6,7 @@ requirements = [
     "lassie>=0.11.7",
     "readability-lxml>=0.8.1",
     "backoff>=1.10.0",
+    "beautifulsoup4>=4.9.2",
     "logzero",
 ]
 
@@ -22,7 +23,7 @@ setup(
     description=("""cache metadata from URLs"""),
     long_description=long_description,
     long_description_content_type="text/markdown",
-    license='http://www.apache.org/licenses/LICENSE-2.0',
+    license="http://www.apache.org/licenses/LICENSE-2.0",
     packages=find_packages("src"),
     zip_safe=False,
     package_dir={"": "src"},

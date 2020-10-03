@@ -169,7 +169,7 @@ class MetadataCache:
     _metadata_fp = "metadata.json"
     _subtitles_fp = "subtitles.srt"
     _html_fp = "summary.html"
-    _markdown_fp = "summary.md"
+    _summary_fp = "summary.txt"
     _timestamp_fp = "epoch_timestamp.txt"
 
     _handler_map = None
@@ -181,11 +181,13 @@ class MetadataCache:
     @classmethod
     def _handler(cls):
         if cls._handler_map is None:
-            cls._handler_map = {"metadata": cls._metadata_fp,
-            "subtitles": cls._subtitles_fp,
-            "html": cls._html_fp,
-            "markdown": cls._markdown_fp,
-            "timestamp": cls._timestamp_fp}
+            cls._handler_map = {
+                "metadata": cls._metadata_fp,
+                "subtitles": cls._subtitles_fp,
+                "html": cls._html_fp,
+                "text": cls._summary_fp,
+                "timestamp": cls._timestamp_fp,
+            }
         return cls._handler_map
 
     # helper to get a metadata file
@@ -219,9 +221,9 @@ class MetadataCache:
         if htmlpath.exists():
             metadata.html_summary = htmlpath.read_text()
 
-        mdpath: Path = cl._path(tdir, "markdown")
-        if mdpath.exists():
-            metadata.markdown_summary = mdpath.read_text()
+        tpath: Path = cl._path(tdir, "text")
+        if tpath.exists():
+            metadata.text_summary = tpath.read_text()
 
         subpath: Path = cl._path(tdir, "subtitles")
         if subpath.exists():
@@ -229,7 +231,9 @@ class MetadataCache:
 
         tspath: Path = cl._path(tdir, "timestamp")
         if tspath.exists():
-            metadata.timestamp = datetime.fromtimestamp(int(tspath.read_text().strip()), tz=timezone.utc)
+            metadata.timestamp = datetime.fromtimestamp(
+                int(tspath.read_text().strip()), tz=timezone.utc
+            )
 
         return metadata
 
@@ -259,10 +263,9 @@ class MetadataCache:
             with cl._path(tdir, "html").open("w") as content_f:
                 content_f.write(data.html_summary)
 
-        # if this has parsed markdown from pandoc
-        if data.markdown_summary is not None:
-            with cl._path(tdir, "markdown").open("w") as md_f:
-                md_f.write(data.markdown_summary)
+        if data.text_summary is not None:
+            with cl._path(tdir, "text").open("w") as text_f:
+                text_f.write(data.text_summary)
 
         # if this has subtitles
         if data.subtitles is not None:

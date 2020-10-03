@@ -10,6 +10,7 @@ from typing import Optional, Union
 
 import backoff
 import readability
+from bs4 import BeautifulSoup
 from lassie import Lassie, LassieError
 from appdirs import user_data_dir
 from requests import Session, Response
@@ -97,7 +98,7 @@ class URLMetadataCache:
         self.lassie: Lassie = ll
 
         # default 'last response received' to None
-        self._response = None
+        self._response: Optional[Response] = None
 
     def save_http_response(self, resp: Response) -> None:
         """
@@ -109,7 +110,7 @@ class URLMetadataCache:
         # response I want; with the main page content
         self._response = resp
 
-    def get(self, url: str) -> Metadata:
+    def get(self, url: str) -> Optional[Metadata]:
         uurl: str = clean_url(url)
         if not self.in_cache(uurl):
             data: Metadata = self.request_data(uurl)
@@ -123,10 +124,11 @@ class URLMetadataCache:
         return self.metadata_cache.has(uurl)
 
     def request_data(self, url: str) -> Metadata:
-        metadata = Metadata(url=url)
+        uurl: str = clean_url(url)
+        metadata = Metadata(url=uurl)
         # if this matches a youtube url, download subtitles
         try:
-            yt_video_id: str = get_yt_video_id(url)
+            yt_video_id: str = get_yt_video_id(uurl)
             # I think this is dangerous to do, might cause URL mismatches
             # on the other hand, it causes duplicate downloads if GET info
             # present in the query
@@ -152,7 +154,7 @@ class URLMetadataCache:
         # try to fetch metadata data with lassie, requests.Session saves the response object using a callback
         # to self._response
         try:
-            metadata.info = self._fetch_lassie(url)
+            metadata.info = self._fetch_lassie(uurl)
         except URLMetadataRequestException:
             # failed after waiting 13, 21, 34 seconds successively
             pass
@@ -161,18 +163,31 @@ class URLMetadataCache:
         # use readability lib to parse self._response.text
         # if we're at this point, that should always be the latest
         # response, see https://github.com/michaelhelmick/lassie/blob/dd525e6243a989f083534921a1a1206931e608ec/lassie/core.py#L244-L266
-        if bool(metadata.info) and self._response is not None and self._response.text.strip():
+        if (
+            bool(metadata.info)
+            and self._response is not None
+            and self._response.text.strip()
+        ):
             if self._response.status_code < 400:
                 doc = readability.Document(self._response.text)
                 metadata.html_summary = doc.summary()
             else:
                 self.logger.warning(
-                    f"Response code for {url} is {self._response.status_code}, skipping HTML extraction..."
+                    f"Response code for {uurl} is {self._response.status_code}, skipping HTML extraction..."
                 )
 
         if metadata.html_summary is not None:
-            # TODO: parse with pandoc
-            pass
+            # modified from https://stackoverflow.com/a/24618186/9348376
+            soup = BeautifulSoup(metadata.html_summary, features="html.parser")
+            # kill all script and style elements
+            for script in soup(["script", "style"]):
+                script.extract()  # rip it out
+            # break into lines and remove leading and trailing space on each
+            lines = (line.strip() for line in soup.get_text().splitlines())
+            # break multi-headlines into a line each
+            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+            # drop blank lines
+            metadata.text_summary = "\n".join(chunk for chunk in chunks if chunk)
         return metadata
 
     @backoff.on_exception(
