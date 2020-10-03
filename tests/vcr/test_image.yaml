@@ -1,0 +1,74 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/603.1.20 (KHTML,
+        like Gecko) Version/10.1 Safari/603.1.20
+    method: HEAD
+    uri: https://i.picsum.photos/id/1000/367/267.jpg?hmac=uO9iQNujyGpqk0Ieytv_xfwbpy3ENW4PhnIZ1gsnldI
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Picsum-ID
+      Age:
+      - '2414470'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 5dc5a4ec4c03025a-SJC
+      Cache-Control:
+      - public, max-age=2592000
+      Cf-Bgj:
+      - h2pri
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - inline; filename="1000-367x267.jpg"
+      Content-Length:
+      - '12339'
+      Content-Type:
+      - image/jpeg
+      Date:
+      - Sat, 03 Oct 2020 09:30:24 GMT
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Picsum-Id:
+      - '1000'
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=da8411d951a6a9caaccbf5e8c3317e8001601717424; expires=Mon, 02-Nov-20
+        09:30:24 GMT; path=/; domain=.picsum.photos; HttpOnly; SameSite=Lax; Secure
+      Strict-Transport-Security:
+      - max-age=15552000
+      Vary:
+      - Accept-Encoding
+      Via:
+      - 1.1 varnish (Varnish/6.2)
+      - 1.1 varnish (Varnish/6.2)
+      X-Content-Type-Options:
+      - nosniff
+      X-Varnish:
+      - 13731396 3113993
+      - '1904275'
+      alt-svc:
+      - h3-27=":443"; ma=86400, h3-28=":443"; ma=86400, h3-29=":443"; ma=86400
+      cf-request-id:
+      - 058f6567ad0000025a461ab200000001
+    status:
+      code: 200
+      message: OK
+version: 1
