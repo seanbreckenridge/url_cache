@@ -87,6 +87,8 @@ from url_metadata import URLMetadataCache
 # save to a folder in my home directory
 cache = URLMetadataCache(loglevel=logging.DEBUG, sleep_time=2, cache_dir="~/mydata")
 c = cache.get("https://github.com/seanbreckenridge/url_metadata")
+# just request information, don't read/save to cache
+data = cache.request_data("https://www.wikipedia.org/")
 ```
 
 ---
@@ -107,7 +109,7 @@ Options:
 Commands:
   cachedir  Prints the location of the local cache directory
   export    Print all cached information as JSON
-  get       Get information for one or more URLs.
+  get       Get information for one or more URLs
   list      List all cached URLs
 ```
 ### CLI Examples
