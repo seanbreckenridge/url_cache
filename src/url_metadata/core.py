@@ -35,7 +35,7 @@ class SaveSession(Session):
     Allows me to expose the request objects after requests using lassie
     """
 
-    def __init__(self, cb_func: Callable[[Response], None], *args, **kwargs) -> None: # type: ignore[no-untyped-def]
+    def __init__(self, cb_func: Callable[[Response], None], *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
         """
         cb_func: A callback function which saves the response
         """
@@ -46,7 +46,7 @@ class SaveSession(Session):
         """
         Save the latest response for a requests.Session
         """
-        resp: Response = super().send(*args, **kwargs) # type: ignore[no-untyped-call]
+        resp: Response = super().send(*args, **kwargs)  # type: ignore[no-untyped-call]
         self.cb_func(resp)
         return resp
 
@@ -209,7 +209,9 @@ class URLMetadataCache:
     def _fetch_lassie(self, url: str) -> Optional[Dict[str, Any]]:
         self.logger.debug("Fetching metadata for {}".format(url))
         try:
-            meta: Dict[str, Any] = self.lassie.fetch(url, handle_file_content=True, all_images=True)
+            meta: Dict[str, Any] = self.lassie.fetch(
+                url, handle_file_content=True, all_images=True
+            )
             return meta
         except LassieError as le:
             self.logger.warning("Could not retrieve metadata from lassie: " + str(le))

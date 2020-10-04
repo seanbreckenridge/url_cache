@@ -58,4 +58,3 @@ def get_yt_video_id(url: str) -> str:
     elif "youtu.be" in query.hostname:
         return query.path[1:]
     raise URLMetadataException("Could not parse video id from {}".format(url))
-

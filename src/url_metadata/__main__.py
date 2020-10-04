@@ -40,10 +40,7 @@ ucache: Optional[URLMetadataCache] = None
     default=DEFAULT_SUBTITLE_LANGUAGE,
     help="Subtitle language for Youtube captions",
 )
-def main(cache_dir: str,
-         debug: bool,
-         sleep_time: int,
-         subtitle_language: str) -> None:
+def main(cache_dir: str, debug: bool, sleep_time: int, subtitle_language: str) -> None:
     global ucache
     ucache = URLMetadataCache(
         loglevel=logging.DEBUG if debug else DEFAULT_LOGLEVEL,
