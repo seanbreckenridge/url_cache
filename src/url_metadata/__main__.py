@@ -40,7 +40,10 @@ ucache: Optional[URLMetadataCache] = None
     default=DEFAULT_SUBTITLE_LANGUAGE,
     help="Subtitle language for Youtube captions",
 )
-def main(cache_dir, debug, sleep_time, subtitle_language):
+def main(cache_dir: str,
+         debug: bool,
+         sleep_time: int,
+         subtitle_language: str) -> None:
     global ucache
     ucache = URLMetadataCache(
         loglevel=logging.DEBUG if debug else DEFAULT_LOGLEVEL,
@@ -59,7 +62,7 @@ def main(cache_dir, debug, sleep_time, subtitle_language):
     help="Don't print output, just cache URL",
 )
 @click.argument("url", nargs=-1, required=True)
-def get(quiet, url):
+def get(quiet: bool, url: str) -> None:
     """
     Get information for one or more URLs
 
@@ -87,7 +90,7 @@ def list_keys(cache_dir: Path) -> List[Path]:
     default=False,
     help="Print directory location instead of URL",
 )
-def list(location, json):
+def list(location: str, json: bool) -> None:
     """List all cached URLs"""
     keyfiles = list_keys(ucache.cache_dir)  # type: ignore[union-attr]
     values = []
@@ -105,7 +108,7 @@ def list(location, json):
 
 
 @main.command()
-def export():
+def export() -> None:
     """Print all cached information as JSON"""
     keyfiles: List[Path] = list_keys(ucache.cache_dir)  # type: ignore[union-attr]
     minfo_list: List[Metadata] = []
@@ -115,7 +118,7 @@ def export():
 
 
 @main.command()
-def cachedir():
+def cachedir() -> None:
     """Prints the location of the local cache directory"""
     click.echo(str(ucache.cache_dir))  # type: ignore[union-attr]
 

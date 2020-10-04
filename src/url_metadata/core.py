@@ -7,7 +7,7 @@ import os
 import logging
 from time import sleep
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, Callable, Any, Dict
 
 import backoff  # type: ignore
 import readability  # type: ignore
@@ -35,18 +35,18 @@ class SaveSession(Session):
     Allows me to expose the request objects after requests using lassie
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, cb_func: Callable[[Response], None], *args, **kwargs) -> None: # type: ignore[no-untyped-def]
         """
         cb_func: A callback function which saves the response
         """
-        self.cb_func = kwargs.pop("cb_func")
+        self.cb_func = cb_func
         super().__init__(*args, **kwargs)  # type: ignore[call-arg]
 
-    def send(self, *args, **kwargs):
+    def send(self, *args, **kwargs) -> Response:  # type: ignore[no-untyped-def]
         """
         Save the latest response for a requests.Session
         """
-        resp = super().send(*args, **kwargs)
+        resp: Response = super().send(*args, **kwargs) # type: ignore[no-untyped-call]
         self.cb_func(resp)
         return resp
 
@@ -58,7 +58,7 @@ class URLMetadataCache:
         subtitle_language: str = DEFAULT_SUBTITLE_LANGUAGE,
         sleep_time: int = DEFAULT_SLEEP_TIME,
         cache_dir: Optional[Union[str, Path]] = None,
-    ):
+    ) -> None:
         """
         Main interface to the library
 
@@ -189,9 +189,9 @@ class URLMetadataCache:
         if (
             bool(metadata.info)
             and self._response is not None
-            and self._response.text.strip()
+            and len(self._response.text) > 0  # type: ignore[unreachable]
         ):
-            if self._response.status_code < 400:
+            if self._response.status_code < 400:  # type: ignore[unreachable]
                 doc = readability.Document(self._response.text)
                 metadata.html_summary = doc.summary()
             else:
@@ -206,10 +206,11 @@ class URLMetadataCache:
     @backoff.on_exception(
         fibo_backoff, URLMetadataRequestException, max_tries=3, on_backoff=backoff_warn
     )
-    def _fetch_lassie(self, url):
+    def _fetch_lassie(self, url: str) -> Optional[Dict[str, Any]]:
         self.logger.debug("Fetching metadata for {}".format(url))
         try:
-            return self.lassie.fetch(url, handle_file_content=True, all_images=True)
+            meta: Dict[str, Any] = self.lassie.fetch(url, handle_file_content=True, all_images=True)
+            return meta
         except LassieError as le:
             self.logger.warning("Could not retrieve metadata from lassie: " + str(le))
         if self._response is not None and self._response.status_code == 429:

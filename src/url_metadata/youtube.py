@@ -26,7 +26,7 @@ def download_subtitles(youtube_id: str, lang: str = "en") -> str:
 
 
 # https://gist.github.com/kmonsoor/2a1afba4ee127cce50a0
-def get_yt_video_id(url: str):
+def get_yt_video_id(url: str) -> str:
     """Returns Video_ID extracting from the given url of Youtube
 
     Examples of URLs:
@@ -57,5 +57,5 @@ def get_yt_video_id(url: str):
             return query.path.split("/")[2]
     elif "youtu.be" in query.hostname:
         return query.path[1:]
-    else:
-        raise URLMetadataException("Could not parse video id from {}".format(url))
+    raise URLMetadataException("Could not parse video id from {}".format(url))
+

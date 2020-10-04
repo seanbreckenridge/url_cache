@@ -7,7 +7,7 @@ import shutil
 import json
 from datetime import datetime, timezone
 from hashlib import md5
-from typing import Optional, List
+from typing import Optional, List, Dict
 from pathlib import Path
 from functools import lru_cache
 
@@ -179,7 +179,7 @@ class MetadataCache:
         self.cache = DirCache(str(self.data_dir))
 
     @classmethod
-    def _handler(cls):
+    def _handler(cls) -> Dict[str, str]:
         if cls._handler_map is None:
             cls._handler_map = {
                 "metadata": cls._metadata_fp,

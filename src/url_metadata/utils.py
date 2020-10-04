@@ -1,7 +1,7 @@
 import warnings
 from urllib.parse import unquote
 from pathlib import Path
-from typing import Union, Iterator
+from typing import Union, Iterator, Dict, Any
 
 import backoff  # type: ignore
 from bs4 import BeautifulSoup  # type: ignore
@@ -27,7 +27,7 @@ def fibo_backoff() -> Iterator[int]:
     yield from fib
 
 
-def backoff_warn(details):
+def backoff_warn(details: Dict[str, Any]) -> None:
     warning_msg: str = "Backing off {wait:0.1f} seconds afters {tries} tries with {args} {kwargs}".format(
         **details
     )
