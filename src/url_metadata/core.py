@@ -35,12 +35,12 @@ class SaveSession(Session):
     Allows me to expose the request objects after requests using lassie
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
         cb_func: A callback function which saves the response
         """
         self.cb_func = kwargs.pop("cb_func")
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)  # type: ignore[call-arg]
 
     def send(self, *args, **kwargs):
         """
@@ -212,7 +212,7 @@ class URLMetadataCache:
             return self.lassie.fetch(url, handle_file_content=True, all_images=True)
         except LassieError as le:
             self.logger.warning("Could not retrieve metadata from lassie: " + str(le))
-        if self._response.status_code == 429:
+        if self._response is not None and self._response.status_code == 429:
             raise URLMetadataRequestException(
                 "Received 429 for URL {}, waiting to retry...".format(url)
             )

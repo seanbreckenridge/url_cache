@@ -5,7 +5,7 @@ CLI interface to url_metadata
 import logging
 from json import dumps
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import click
 
@@ -18,7 +18,7 @@ from .core import (
 from .core import Metadata
 
 # cache object for all commands
-ucache = None
+ucache: Optional[URLMetadataCache] = None
 
 
 @click.group()
@@ -67,7 +67,7 @@ def get(quiet, url):
     """
     minfo_list: List[Metadata] = []
     for u in url:
-        minfo_list.append(ucache.get(u))
+        minfo_list.append(ucache.get(u))  # type: ignore[union-attr]
     if not quiet:
         click.echo(dumps([m.to_dict() for m in minfo_list]))
 
@@ -89,7 +89,7 @@ def list_keys(cache_dir: Path) -> List[Path]:
 )
 def list(location, json):
     """List all cached URLs"""
-    keyfiles = list_keys(ucache.cache_dir)
+    keyfiles = list_keys(ucache.cache_dir)  # type: ignore[union-attr]
     values = []
     if location:
         for p in keyfiles:
@@ -107,17 +107,17 @@ def list(location, json):
 @main.command()
 def export():
     """Print all cached information as JSON"""
-    keyfiles: List[str] = list_keys(ucache.cache_dir)
+    keyfiles: List[Path] = list_keys(ucache.cache_dir)  # type: ignore[union-attr]
     minfo_list: List[Metadata] = []
     for k in keyfiles:
-        minfo_list.append(ucache.get(k.read_text()))
+        minfo_list.append(ucache.get(k.read_text()))  # type: ignore[union-attr]
     click.echo(dumps([m.to_dict() for m in minfo_list]))
 
 
 @main.command()
 def cachedir():
     """Prints the location of the local cache directory"""
-    click.echo(str(ucache.cache_dir))
+    click.echo(str(ucache.cache_dir))  # type: ignore[union-attr]
 
 
 if __name__ == "__main__":
