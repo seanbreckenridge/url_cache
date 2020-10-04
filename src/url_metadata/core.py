@@ -50,7 +50,7 @@ class SaveSession(Session):
         """
         Save the latest response for a requests.Session
         """
-        resp: Response = super().send(**kwargs)  # type: ignore[no-untyped-call]
+        resp: Response = super().send(request, **kwargs)  # type: ignore[no-untyped-call]
         self.cb_func(resp)
         return resp
 
