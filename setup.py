@@ -17,7 +17,7 @@ with io.open("README.md", encoding="utf-8") as fo:
 
 setup(
     name="url_metadata",
-    version="0.1.2",
+    version="0.1.3",
     url="https://github.com/seanbreckenridge/url_metadata",
     author="Sean Breckenridge",
     author_email="seanbrecke@gmail.com",
