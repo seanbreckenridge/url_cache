@@ -3,8 +3,8 @@ from urllib.parse import unquote
 from pathlib import Path
 from typing import Union, Iterator, Dict, Any
 
-import backoff  # type: ignore
-from bs4 import BeautifulSoup  # type: ignore
+import backoff  # type: ignore[import]
+from bs4 import BeautifulSoup  # type: ignore[import]
 
 
 def normalize_path(p: Union[str, Path]) -> Path:

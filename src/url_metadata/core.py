@@ -9,12 +9,12 @@ from time import sleep
 from pathlib import Path
 from typing import Optional, Union, Callable, Any, Dict
 
-import backoff  # type: ignore
-import readability  # type: ignore
-from logzero import setup_logger, formatter  # type: ignore
-from lassie import Lassie, LassieError  # type: ignore
-from appdirs import user_data_dir, user_log_dir  # type: ignore
-from requests import Session, Response
+import backoff  # type: ignore[import]
+import readability  # type: ignore[import]
+from logzero import setup_logger, formatter  # type: ignore[import]
+from lassie import Lassie, LassieError  # type: ignore[import]
+from appdirs import user_data_dir, user_log_dir  # type: ignore[import]
+from requests import Session, Response, Request
 
 from .exceptions import URLMetadataException, URLMetadataRequestException
 from .cache import MetadataCache
@@ -35,18 +35,22 @@ class SaveSession(Session):
     Allows me to expose the request objects after requests using lassie
     """
 
-    def __init__(self, cb_func: Callable[[Response], None], *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    # requests.Session doesn't accept any arguments
+    def __init__(self, cb_func: Callable[[Response], None]) -> None:
         """
         cb_func: A callback function which saves the response
         """
         self.cb_func = cb_func
-        super().__init__(*args, **kwargs)  # type: ignore[call-arg]
+        super().__init__()
 
-    def send(self, *args, **kwargs) -> Response:  # type: ignore[no-untyped-def]
+    # type annotations for kwargs must specify kwargs for *one* of the kwargs; quite arbitrarily chosen
+    # https://stackoverflow.com/a/37032111/9348376
+    # https://github.com/psf/requests/blob/4f6c0187150af09d085c03096504934eb91c7a9e/requests/sessions.py#L626
+    def send(self, request: Request, **kwargs: bool) -> Response:
         """
         Save the latest response for a requests.Session
         """
-        resp: Response = super().send(*args, **kwargs)  # type: ignore[no-untyped-call]
+        resp: Response = super().send(**kwargs)  # type: ignore[no-untyped-call]
         self.cb_func(resp)
         return resp
 
