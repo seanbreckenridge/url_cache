@@ -8,6 +8,7 @@ requirements = [
     "backoff>=1.10.0",
     "beautifulsoup4>=4.5.3",  # lowered becuase lassie is on an old dep, to work with new pip feature resolver
     "click>=7.1.2",
+    "requests",
     "logzero",
 ]
 
@@ -17,7 +18,7 @@ with io.open("README.md", encoding="utf-8") as fo:
 
 setup(
     name="url_metadata",
-    version="0.1.3",
+    version="0.1.4",
     url="https://github.com/seanbreckenridge/url_metadata",
     author="Sean Breckenridge",
     author_email="seanbrecke@gmail.com",
