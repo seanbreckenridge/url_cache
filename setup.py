@@ -6,7 +6,7 @@ requirements = [
     "lassie>=0.11.7",
     "readability-lxml>=0.8.1",
     "backoff>=1.10.0",
-    "beautifulsoup4>=4.5.3",  # lowered becuase lassie is on an old dep, to work with new pip feature resolver
+    "beautifulsoup4>=4.5.3",  # lowered because lassie is on an old dep, to work with new pip feature resolver
     "click>=7.1.2",
     "requests",
     "logzero",
