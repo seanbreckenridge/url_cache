@@ -35,16 +35,29 @@ ucache: Optional[URLMetadataCache] = None
     help="How long to sleep between requests",
 )
 @click.option(
+    "--skip-subtitles",
+    is_flag=True,
+    default=False,
+    help="Don't attempt to download subtitles",
+)
+@click.option(
     "--subtitle-language",
     type=str,
     default=DEFAULT_SUBTITLE_LANGUAGE,
     help="Subtitle language for Youtube captions",
 )
-def main(cache_dir: str, debug: bool, sleep_time: int, subtitle_language: str) -> None:
+def main(
+    cache_dir: str,
+    debug: bool,
+    sleep_time: int,
+    skip_subtitles: bool,
+    subtitle_language: str,
+) -> None:
     global ucache
     ucache = URLMetadataCache(
         loglevel=logging.DEBUG if debug else DEFAULT_LOGLEVEL,
         subtitle_language=subtitle_language,
+        skip_subtitles=skip_subtitles,
         sleep_time=sleep_time,
         cache_dir=cache_dir,
     )

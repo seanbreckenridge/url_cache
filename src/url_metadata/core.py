@@ -17,10 +17,10 @@ from appdirs import user_data_dir, user_log_dir  # type: ignore[import]
 from requests import Session, Response, Request
 
 from .exceptions import URLMetadataException, URLMetadataRequestException
-from .cache import MetadataCache
+from .cache import MetadataCache, DirCacheMiss
 from .model import Metadata
 from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url, html_get_text
-from .youtube import download_subtitles, get_yt_video_id, YoutubeException
+from .youtube import download_subtitles, get_yt_video_id, YoutubeSubtitlesException
 
 DEFAULT_LOGLEVEL = logging.WARNING
 DEFAULT_SUBTITLE_LANGUAGE = "en"
@@ -61,12 +61,17 @@ class URLMetadataCache:
         loglevel: int = DEFAULT_LOGLEVEL,
         subtitle_language: str = DEFAULT_SUBTITLE_LANGUAGE,
         sleep_time: int = DEFAULT_SLEEP_TIME,
+        skip_subtitles: bool = False,
         cache_dir: Optional[Union[str, Path]] = None,
     ) -> None:
         """
         Main interface to the library
 
-        Supply 'cache_dir' to overwrite the default location.
+        subtitle_language: for youtube subtitle requests
+        sleep_time: time to wait between HTTP requests
+        skip_subtitles: don't attempt to download youtube subtitles
+        cache_dir: location the store cached data.
+                   uses default user cache directory if not provided
         """
 
         # handle cache dir
@@ -102,6 +107,7 @@ class URLMetadataCache:
             ),
         )
 
+        self.skip_subtitles: bool = skip_subtitles
         self.subtitle_language: str = subtitle_language
         self.sleep_time: int = sleep_time
 
@@ -138,6 +144,17 @@ class URLMetadataCache:
         uurl: str = clean_url(url)
         return self.metadata_cache.has(uurl)
 
+    def get_cache_dir(self, url: str) -> Optional[str]:
+        """
+        If this URL is in cache, returns the location of the cache directory
+        Returns None if it couldn't find a matching directory
+        """
+        uurl: str = clean_url(url)
+        try:
+            return self.metadata_cache.cache.get(uurl)
+        except:
+            return None
+
     def request_data(self, url: str) -> Metadata:
         """
         Given a URL:
@@ -151,29 +168,34 @@ class URLMetadataCache:
         """
         uurl: str = clean_url(url)
         metadata = Metadata(url=uurl)
-        # if this matches a youtube url, download subtitles
-        try:
-            yt_video_id: str = get_yt_video_id(uurl)  # can raise URLMetadataException
-            # I think this is dangerous to do, might cause URL mismatches
-            # on the other hand, it causes duplicate downloads if GET info
-            # present in the query
-            # url = "https://www.youtube.com/watch?v={}".format(yt_video_id)
+
+        # if user didn't specify to skip trying to download subtitles
+        if not self.skip_subtitles:
             try:
-                self.logger.debug(
-                    "Downloading subtitles for Youtube ID: {}".format(yt_video_id)
-                )
-                metadata.subtitles = download_subtitles(
-                    yt_video_id, self.subtitle_language
-                )
-            except YoutubeException as ye:
-                self.logger.debug(str(ye))
-            # sleep even if it failed to parse, still made the request to youtube
-            # won't sleep if url doesn't match youtube
-            sleep(self.sleep_time)
-        except URLMetadataException:
-            # don't log here, very common failure for the URL
-            # to not be parsable as a Youtube URL
-            pass
+                # if this matches a youtube url, download subtitles
+                yt_video_id: str = get_yt_video_id(
+                    uurl
+                )  # can raise URLMetadataException
+                # I think this is dangerous to do, might cause URL mismatches
+                # on the other hand, it causes duplicate downloads if GET info
+                # present in the query
+                # url = "https://www.youtube.com/watch?v={}".format(yt_video_id)
+                try:
+                    self.logger.debug(
+                        "Downloading subtitles for Youtube ID: {}".format(yt_video_id)
+                    )
+                    metadata.subtitles = download_subtitles(
+                        yt_video_id, self.subtitle_language
+                    )
+                except YoutubeSubtitlesException as ye:  # this catches both request and track/subtitle exceptions
+                    self.logger.debug(str(ye))
+                # sleep even if it failed to parse, still made the request to youtube
+                # won't sleep if url doesn't match youtube
+                sleep(self.sleep_time)
+            except URLMetadataException:
+                # don't log here, very common failure for the URL
+                # to not be parsable as a Youtube URL
+                pass
 
         # set self._response, to make sure we're not using stale request information when parsing with readability
         self._response = None

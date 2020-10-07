@@ -3,11 +3,7 @@ from urllib.parse import urlparse, parse_qs, ParseResult
 
 from .exceptions import URLMetadataException
 
-from .yt_subs.subtitles_downloader import TrackNotFoundException, VideoParsingException, download_subs  # type: ignore
-
-
-class YoutubeException(Exception):
-    pass
+from .yt_subs import YoutubeSubtitlesException, download_subs  # type: ignore
 
 
 def download_subtitles(youtube_id: str, lang: str = "en") -> str:
@@ -17,12 +13,9 @@ def download_subtitles(youtube_id: str, lang: str = "en") -> str:
 
     returns a string which has the .srt file contents
 
-    Raises YoutubeException on errors
+    Raises YoutubeSubtitlesException on errors
     """
-    try:
-        return download_subs(youtube_id, lang)
-    except (TrackNotFoundException, VideoParsingException) as e:
-        raise YoutubeException(str(e))
+    return download_subs(youtube_id, lang)
 
 
 # https://gist.github.com/kmonsoor/2a1afba4ee127cce50a0
