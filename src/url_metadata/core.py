@@ -70,7 +70,7 @@ class URLMetadataCache:
         subtitle_language: for youtube subtitle requests
         sleep_time: time to wait between HTTP requests
         skip_subtitles: don't attempt to download youtube subtitles
-        cache_dir: location the store cached data.
+        cache_dir: location the store cached data
                    uses default user cache directory if not provided
         """
 
@@ -121,9 +121,9 @@ class URLMetadataCache:
 
     def get(self, url: str) -> Metadata:
         """
-        Gets metadata/summary for a URL.
+        Gets metadata/summary for a URL
         Save the parsed information in a local data directory
-        If the URL already has cached data locally, returns that instead.
+        If the URL already has cached data locally, returns that instead
         """
         uurl: str = clean_url(url)
         if not self.in_cache(uurl):

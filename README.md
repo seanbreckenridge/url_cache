@@ -40,39 +40,74 @@ This uses:
 
 ### Usage:
 
+The CLI interface provides some utility commands to get/list information from the cache.
+
+```
+$ url_metadata --help
+Usage: url_metadata [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --cache-dir PATH          Override default cache directory location
+  --debug / --no-debug      Increase log verbosity
+  --sleep-time INTEGER      How long to sleep between requests
+  --skip-subtitles          Don't attempt to download subtitles
+  --subtitle-language TEXT  Subtitle language for Youtube captions
+  --help                    Show this message and exit.
+
+Commands:
+  cachedir  Prints the location of the local cache directory
+  export    Print all cached information as JSON
+  get       Get information for one or more URLs Prints results as JSON
+  list      List all cached URLs
+```
+
+---
+
 In Python, this can be configured by using the `url_metadata.URLMetadataCache` class:
 
 ```python
-   URLMetadataCache(loglevel: int = logging.WARNING,
-                    subtitle_language: str = 'en',
-                    sleep_time: int = 5,
-                    cache_dir: Union[str, pathlib.Path, NoneType] = None) -> url_metadata.URLMetadataCache:
-       """
-       Main interface to the library
-       Supply 'cache_dir' to overwrite the default location.
-       """
+url_metadata.URLMetadataCache(loglevel: int = 30,
+                            subtitle_language: str = 'en',
+                            sleep_time: int = 5,
+                            skip_subtitles: bool = False,
+                            cache_dir: Optional[str, pathlib.Path] = None):
+    """
+    Main interface to the library
 
-   get(self, url: str) -> url_metadata.model.Metadata
-       """
-       Gets metadata/summary for a URL.
-       Save the parsed information in a local data directory
-       If the URL already has cached data locally, returns that instead.
-       """
+    subtitle_language: for youtube subtitle requests
+    sleep_time: time to wait between HTTP requests
+    skip_subtitles: don't attempt to download youtube subtitles
+    cache_dir: location the store cached data
+               uses default user cache directory if not provided
+    """
 
-   in_cache(self, url: str) -> bool
-       """
-       Returns True if the URL already has cached information
-       """
+get(self, url: str) -> url_metadata.model.Metadata
+    """
+    Gets metadata/summary for a URL
+    Save the parsed information in a local data directory
+    If the URL already has cached data locally, returns that instead
+    """
 
-   request_data(self, url: str) -> url_metadata.model.Metadata
-       """
-       Given a URL:
+get_cache_dir(self, url: str) -> Optional[str]
+    """
+    If this URL is in cache, returns the location of the cache directory
+    Returns None if it couldn't find a matching directory
+    """
 
-       If this is a youtube URL, this requests youtube subtitles
-       Uses lassie to grab metadata
-       Parses the HTML text with readablity
-       uses bs4 to parse that text into a plaintext summary
-       """
+in_cache(self, url: str) -> bool
+    """
+    Returns True if the URL already has cached information
+    """
+
+request_data(self, url: str) -> url_metadata.model.Metadata
+    """
+    Given a URL:
+
+    If this is a youtube URL, this requests youtube subtitles
+    Uses lassie to grab metadata
+    Parses the HTML text with readablity
+    uses bs4 to parse that text into a plaintext summary
+    """
 ```
 
 For example:
@@ -90,27 +125,6 @@ c = cache.get("https://github.com/seanbreckenridge/url_metadata")
 data = cache.request_data("https://www.wikipedia.org/")
 ```
 
----
-
-The CLI interface lets you specify much the same; and provides some utility commands to get/list information from the cache.
-
-```
-$ url_metadata
-Usage: url_metadata [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  --cache-dir PATH          Override default directory cache location
-  --debug / --no-debug      Increase log verbosity
-  --sleep-time INTEGER      How long to sleep between requests
-  --subtitle-language TEXT  Subtitle language for Youtube captions
-  --help                    Show this message and exit.
-
-Commands:
-  cachedir  Prints the location of the local cache directory
-  export    Print all cached information as JSON
-  get       Get information for one or more URLs
-  list      List all cached URLs
-```
 ### CLI Examples
 
 The `get` command emits `JSON`, so it could with other tools (e.g. [`jq`](https://stedolan.github.io/jq/)) used like:
@@ -144,7 +158,7 @@ $ tar -cvzf url_metadata.tar.gz "$(url_metadata cachedir)"
 
 Accessible through the `url_metadata` script and `python3 -m url_metadata`
 
----
+### Implementation Notes
 
 This stores all of this information as individual files in a cache directory (using [`appdirs`](https://github.com/ActiveState/appdirs)). In particular, it `MD5` hashes the URL and stores information like:
 
