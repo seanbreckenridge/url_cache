@@ -14,10 +14,10 @@ import readability  # type: ignore[import]
 from logzero import setup_logger, formatter  # type: ignore[import]
 from lassie import Lassie, LassieError  # type: ignore[import]
 from appdirs import user_data_dir, user_log_dir  # type: ignore[import]
-from requests import Session, Response, Request
+from requests import Session, Response, PreparedRequest
 
 from .exceptions import URLMetadataException, URLMetadataRequestException
-from .cache import MetadataCache, DirCacheMiss
+from .cache import MetadataCache
 from .model import Metadata
 from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url, html_get_text
 from .youtube import download_subtitles, get_yt_video_id, YoutubeSubtitlesException
@@ -46,7 +46,7 @@ class SaveSession(Session):
     # type annotations for kwargs must specify kwargs for *one* of the kwargs; quite arbitrarily chosen
     # https://stackoverflow.com/a/37032111/9348376
     # https://github.com/psf/requests/blob/4f6c0187150af09d085c03096504934eb91c7a9e/requests/sessions.py#L626
-    def send(self, request: Request, **kwargs: bool) -> Response:
+    def send(self, request: PreparedRequest, **kwargs: bool) -> Response:
         """
         Save the latest response for a requests.Session
         """
