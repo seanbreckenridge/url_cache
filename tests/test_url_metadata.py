@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Dict, Any
 
 import pytest
-import vcr # type: ignore[import]
+import vcr  # type: ignore[import]
 
 from url_metadata.core import URLMetadataCache, Metadata
 from url_metadata.cache import DirCache
@@ -63,6 +63,7 @@ def test_doesnt_have_subtitles(ucache) -> None:
     assert not os.path.exists(os.path.join(dir_full_path, "subtitles.srt"))
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
     assert os.path.exists(os.path.join(dir_full_path, "summary.html"))
+
 
 @vcr.use_cassette("tests/vcr/skip_downloading_youtube_subtitles.yaml")
 def test_skip_downloading_youtube_subtitles(ucache) -> None:
@@ -124,5 +125,3 @@ def test_image(ucache) -> None:
     assert not os.path.exists(os.path.join(dir_full_path, "summary.html"))
     assert not os.path.exists(os.path.join(dir_full_path, "summary.txt"))
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
-
-
