@@ -26,8 +26,9 @@ youtube_without_cc = "https://youtu.be/xvQUiX26RfE"
 github_home = "https://github.com"
 image_file = "https://i.picsum.photos/id/1000/367/267.jpg?hmac=uO9iQNujyGpqk0Ieytv_xfwbpy3ENW4PhnIZ1gsnldI"
 
+tests_dir = os.path.dirname(os.path.abspath(__file__))
 
-@vcr.use_cassette("tests/vcr/youtube_subs.yaml")
+@vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_subs.yaml"))
 def test_youtube_has_subtitles(ucache) -> None:
 
     # make sure subtitles download to file
@@ -53,7 +54,7 @@ def test_youtube_has_subtitles(ucache) -> None:
     assert "trade-off between space and time" in subtitles_file.read_text()
 
 
-@vcr.use_cassette("tests/vcr/youtube_no_subs.yaml")
+@vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_no_subs.yaml"))
 def test_doesnt_have_subtitles(ucache) -> None:
     meta_resp = ucache.get(youtube_without_cc)
     # make sure this parsed the youtube id
@@ -65,7 +66,7 @@ def test_doesnt_have_subtitles(ucache) -> None:
     assert os.path.exists(os.path.join(dir_full_path, "summary.html"))
 
 
-@vcr.use_cassette("tests/vcr/skip_downloading_youtube_subtitles.yaml")
+@vcr.use_cassette(os.path.join(tests_dir, "vcr/skip_downloading_youtube_subtitles.yaml"))
 def test_skip_downloading_youtube_subtitles(ucache) -> None:
 
     # see if this URL would succeed usually, download subtitles
@@ -87,7 +88,7 @@ def test_skip_downloading_youtube_subtitles(ucache) -> None:
     assert meta_resp.subtitles is None
 
 
-@vcr.use_cassette("tests/vcr/generic_url.yaml")
+@vcr.use_cassette(os.path.join(tests_dir, "vcr/generic_url.yaml"))
 def test_generic_url(ucache):
     meta_resp = ucache.get(github_home)
     assert ucache.in_cache(github_home)
@@ -103,7 +104,7 @@ def test_generic_url(ucache):
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
 
 
-@vcr.use_cassette("tests/vcr/test_image.yaml")
+@vcr.use_cassette(os.path.join(tests_dir, "vcr/test_image.yaml"))
 def test_image(ucache) -> None:
 
     # test text_summary doesnt exist for image file, since it doesnt have any
