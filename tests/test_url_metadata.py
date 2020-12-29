@@ -28,6 +28,7 @@ image_file = "https://i.picsum.photos/id/1000/367/267.jpg?hmac=uO9iQNujyGpqk0Iey
 
 tests_dir = os.path.dirname(os.path.abspath(__file__))
 
+
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_subs.yaml"))
 def test_youtube_has_subtitles(ucache) -> None:
 
@@ -68,7 +69,9 @@ def test_doesnt_have_subtitles(ucache) -> None:
     assert not os.path.exists(os.path.join(dir_full_path, "summary.txt"))
 
 
-@vcr.use_cassette(os.path.join(tests_dir, "vcr/skip_downloading_youtube_subtitles.yaml"))
+@vcr.use_cassette(
+    os.path.join(tests_dir, "vcr/skip_downloading_youtube_subtitles.yaml")
+)
 def test_skip_downloading_youtube_subtitles(ucache) -> None:
 
     # see if this URL would succeed usually, download subtitles
