@@ -9,7 +9,7 @@ import vcr  # type: ignore[import]
 
 from url_metadata.core import URLMetadataCache, Metadata
 from url_metadata.cache import DirCache
-from url_metadata.youtube import get_yt_video_id
+from url_metadata.sites.youtube import get_yt_video_id
 
 
 @pytest.fixture()
@@ -63,7 +63,9 @@ def test_doesnt_have_subtitles(ucache) -> None:
     dir_full_path = ucache.metadata_cache.cache.get(youtube_without_cc)
     assert not os.path.exists(os.path.join(dir_full_path, "subtitles.srt"))
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
-    assert os.path.exists(os.path.join(dir_full_path, "summary.html"))
+    # this deletes the summary files on purpose, since theyre somewhat useless
+    assert not os.path.exists(os.path.join(dir_full_path, "summary.html"))
+    assert not os.path.exists(os.path.join(dir_full_path, "summary.txt"))
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/skip_downloading_youtube_subtitles.yaml"))

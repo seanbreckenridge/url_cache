@@ -7,7 +7,7 @@ import os
 import logging
 from time import sleep
 from pathlib import Path
-from typing import Optional, Union, Callable, Any, Dict
+from typing import Optional, Union, Callable, Any, Dict, List
 
 import backoff  # type: ignore[import]
 import readability  # type: ignore[import]
@@ -20,7 +20,8 @@ from .exceptions import URLMetadataException, URLMetadataRequestException
 from .cache import MetadataCache
 from .model import Metadata
 from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url, html_get_text
-from .youtube import download_subtitles, get_yt_video_id, YoutubeSubtitlesException
+from .sites import PARSERS
+from .sites.abstract import AbstractSite
 
 DEFAULT_LOGLEVEL = logging.WARNING
 DEFAULT_SUBTITLE_LANGUAGE = "en"
@@ -59,17 +60,18 @@ class URLMetadataCache:
     def __init__(
         self,
         loglevel: int = DEFAULT_LOGLEVEL,
-        subtitle_language: str = DEFAULT_SUBTITLE_LANGUAGE,
         sleep_time: int = DEFAULT_SLEEP_TIME,
-        skip_subtitles: bool = False,
         cache_dir: Optional[Union[str, Path]] = None,
+        additional_site_parsers: Optional[List[Any]] = None,
+        subtitle_language: str = DEFAULT_SUBTITLE_LANGUAGE,
+        skip_subtitles: bool = False,
     ) -> None:
         """
         Main interface to the library
 
         subtitle_language: for youtube subtitle requests
-        sleep_time: time to wait between HTTP requests
         skip_subtitles: don't attempt to download youtube subtitles
+        sleep_time: time to wait between HTTP requests
         cache_dir: location the store cached data
                    uses default user cache directory if not provided
         """
@@ -119,83 +121,33 @@ class URLMetadataCache:
         # default 'last response received' to None
         self._response: Optional[Response] = None
 
-    def get(self, url: str) -> Metadata:
-        """
-        Gets metadata/summary for a URL
-        Save the parsed information in a local data directory
-        If the URL already has cached data locally, returns that instead
-        """
-        uurl: str = clean_url(url)
-        if not self.in_cache(uurl):
-            data: Metadata = self.request_data(uurl)
-            self.metadata_cache.put(uurl, data)
-            return data
-        # returns None if not present
-        fdata: Optional[Metadata] = self.metadata_cache.get(uurl)
-        if fdata is None:
-            raise URLMetadataException(
-                f"Failure retrieving information from cache for {url}"
-            )
-        else:
-            return fdata
+        # initialize site-specific parsers
+        self.parser_classes = PARSERS
+        if additional_site_parsers is not None:
+            for parser in additional_site_parsers:
+                if not issubclass(parser, AbstractSite):
+                    self.logger.warning(f"{parser} is not a subclass of AbstractSite")
+                self.parser_classes.append(parser)
 
-    def in_cache(self, url: str) -> bool:
-        """Returns True if the URL already has cached information"""
-        uurl: str = clean_url(url)
-        return self.metadata_cache.has(uurl)
-
-    def get_cache_dir(self, url: str) -> Optional[str]:
-        """
-        If this URL is in cache, returns the location of the cache directory
-        Returns None if it couldn't find a matching directory
-        """
-        uurl: str = clean_url(url)
-        try:
-            return self.metadata_cache.cache.get(uurl)
-        except:
-            return None
+        self.parsers: List[AbstractSite] = [
+            asite(umc=self) for asite in self.parser_classes
+        ]
 
     def request_data(self, url: str) -> Metadata:
         """
         Given a URL:
 
-        If this is a youtube URL, this requests youtube subtitles
         Uses lassie to grab metadata
         Parses the HTML text with readablity
         uses bs4 to parse that text into a plaintext summary
+
+        Calls each enabled 'site' module, to extract additional information if a site matches the URL
+        e.g. If this is a youtube URL, this requests youtube subtitles
 
         returns all the requested/parsed info as a models.Metdata object
         """
         uurl: str = clean_url(url)
         metadata = Metadata(url=uurl)
-
-        # if user didn't specify to skip trying to download subtitles
-        if not self.skip_subtitles:
-            try:
-                # if this matches a youtube url, download subtitles
-                yt_video_id: str = get_yt_video_id(
-                    uurl
-                )  # can raise URLMetadataException
-                # I think this is dangerous to do, might cause URL mismatches
-                # on the other hand, it causes duplicate downloads if GET info
-                # present in the query
-                # url = "https://www.youtube.com/watch?v={}".format(yt_video_id)
-                try:
-                    self.logger.debug(
-                        "Downloading subtitles for Youtube ID: {}".format(yt_video_id)
-                    )
-                    metadata.subtitles = download_subtitles(
-                        yt_video_id, self.subtitle_language
-                    )
-                except YoutubeSubtitlesException as ye:  # this catches both request and track/subtitle exceptions
-                    self.logger.debug(str(ye))
-                # sleep even if it failed to parse, still made the request to youtube
-                # won't sleep if url doesn't match youtube
-                sleep(self.sleep_time)
-            except URLMetadataException:
-                # don't log here, very common failure for the URL
-                # to not be parsable as a Youtube URL
-                pass
 
         # set self._response, to make sure we're not using stale request information when parsing with readability
         self._response = None
@@ -209,6 +161,7 @@ class URLMetadataCache:
             pass
 
         sleep(self.sleep_time)
+
         # use readability lib to parse self._response.text
         # if we're at this point, that should always be the latest
         # response, see https://github.com/michaelhelmick/lassie/blob/dd525e6243a989f083534921a1a1206931e608ec/lassie/core.py#L244-L266
@@ -227,6 +180,11 @@ class URLMetadataCache:
 
         if metadata.html_summary is not None:
             metadata.text_summary = html_get_text(metadata.html_summary)
+
+        # call hooks for other parsers, if the URL matches
+        for parser in self.parsers:
+            if parser.matches_site(uurl):
+                metadata = parser.extract_info(uurl, metadata)
         return metadata
 
     @backoff.on_exception(
@@ -263,3 +221,39 @@ class URLMetadataCache:
         # to get the content, so this should access the
         # response I want; with the main page content
         self._response = resp
+
+    def get(self, url: str) -> Metadata:
+        """
+        Gets metadata/summary for a URL
+        Save the parsed information in a local data directory
+        If the URL already has cached data locally, returns that instead
+        """
+        uurl: str = clean_url(url)
+        if not self.in_cache(uurl):
+            data: Metadata = self.request_data(uurl)
+            self.metadata_cache.put(uurl, data)
+            return data
+        # returns None if not present
+        fdata: Optional[Metadata] = self.metadata_cache.get(uurl)
+        if fdata is None:
+            raise URLMetadataException(
+                f"Failure retrieving information from cache for {url}"
+            )
+        else:
+            return fdata
+
+    def in_cache(self, url: str) -> bool:
+        """Returns True if the URL already has cached information"""
+        uurl: str = clean_url(url)
+        return self.metadata_cache.has(uurl)
+
+    def get_cache_dir(self, url: str) -> Optional[str]:
+        """
+        If this URL is in cache, returns the location of the cache directory
+        Returns None if it couldn't find a matching directory
+        """
+        uurl: str = clean_url(url)
+        try:
+            return self.metadata_cache.cache.get(uurl)
+        except:
+            return None

@@ -9,7 +9,7 @@ class Metadata:
     Represents all possible data for a URL
 
     URL
-    Basic Info (description, images, page metadata)
+    Info (description, images, page metadata)
     HTML Summary
     Text Summary
     Subtitles (from youtube)
