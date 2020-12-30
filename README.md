@@ -7,7 +7,6 @@ Current TODOs:
 - [ ] Improve CLI interface to match all functions
 - [ ] Improve HTML/text parsing (see [#6](https://github.com/seanbreckenridge/url_metadata/issues/6))
 - [ ] Add more sites using the [abstract interface](https://github.com/seanbreckenridge/url_metadata/blob/master/src/url_metadata/sites/abstract.py), to get more info from sites I use commonly
-- [ ] Add a preprocessing step to the sites abstract interface/URLMetadataCache functions, which 'corrects' URLs, to avoid hash mismatches
 
 A cache which saves URL metadata and summarizes content
 
