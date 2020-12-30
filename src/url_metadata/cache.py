@@ -17,7 +17,7 @@ class MetadataCache:
 
     def __init__(self, data_dir: Path):
         self.data_dir: Path = data_dir
-        self.cache = DirCache(str(self.data_dir))
+        self.dir_cache = DirCache(str(self.data_dir))
         self.fields: List[Tuple[str, MetadataField]] = [
             ("info", MetadataField("metadata.json", MetadataFieldType.JSON)),
             ("html_summary", MetadataField("summary.html", MetadataFieldType.STR)),
@@ -33,7 +33,7 @@ class MetadataCache:
         if not self.has(url):
             return None
 
-        tdir: str = self.cache.get(url)
+        tdir: str = self.dir_cache.get(url)
         metadata = Metadata(url=url)
 
         for (attr, field) in self.fields:
@@ -55,7 +55,7 @@ class MetadataCache:
         if self.has(url):
             self.delete(url)
 
-        tdir: str = self.cache.put(url)
+        tdir: str = self.dir_cache.put(url)
 
         for (attr, field) in self.fields:
             # get the data from the metadata object
@@ -70,14 +70,14 @@ class MetadataCache:
         Returns true/false, signifying whether or not the information
         for this url is already cached
         """
-        return self.cache.exists(url)
+        return self.dir_cache.exists(url)
 
     # not used but here as a library function, incase
     def delete(self, url: str) -> bool:
         """
         Returns true if item was deleted, false if it didn't exist
         """
-        return self.cache.delete(url)
+        return self.dir_cache.delete(url)
 
     def has_null_value(self, url: str) -> bool:
         """
