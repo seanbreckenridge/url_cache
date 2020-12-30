@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Union, Iterator, Dict, Any
 
 import backoff  # type: ignore[import]
-from bs4 import BeautifulSoup  # type: ignore[import]
 
 
 def normalize_path(p: Union[str, Path]) -> Path:
@@ -40,20 +39,3 @@ def clean_url(url: str) -> str:
     https://docs.python.org/3/library/urllib.parse.html#urllib.parse.unquote
     """
     return unquote(url).strip()
-
-
-def html_get_text(html_text: str) -> str:
-    """
-    Extracts text content from HTML text
-    """
-    # modified from https://stackoverflow.com/a/24618186/9348376
-    soup = BeautifulSoup(html_text, features="html.parser")
-    # kill all script and style elements
-    for script in soup(["script", "style"]):
-        script.extract()  # rip it out
-    # break into lines and remove leading and trailing space on each
-    lines = (line.strip() for line in soup.get_text().splitlines())
-    # break multi-headlines into a line each
-    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-    # drop blank lines
-    return "\n".join(chunk for chunk in chunks if chunk)

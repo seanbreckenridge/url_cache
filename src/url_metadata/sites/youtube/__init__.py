@@ -82,5 +82,4 @@ class Youtube(AbstractSite):
         """
         # TODO: add as flag, to prevent this info from being deleted? I think this is fine though
         metadata.html_summary = None
-        metadata.text_summary = None
         return metadata

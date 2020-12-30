@@ -18,8 +18,8 @@ This is meant to provide more context to any of my tools which use URLs. If I [w
 46
 >>> m.info["title"]
 'beautifulsoup4'
->>> m.text_summary[:57]
-"Beautiful Soup is a library that makes it easy to scrape"
+>>> m.info['description']
+'Screen-scraping library'
 ```
 
 If I ever request the same URL again, that info is grabbed from a local directory cache instead.
@@ -114,8 +114,7 @@ request_data(self, url: str) -> url_metadata.model.Metadata
 
     If this is a youtube URL, this requests youtube subtitles
     Uses lassie to grab metadata
-    Parses the HTML text with readablity
-    uses bs4 to parse that text into a plaintext summary
+    Parses/minifies the HTML text with readablity/lxml
     """
 ```
 
@@ -140,12 +139,12 @@ The `get` command emits `JSON`, so it could with other tools (e.g. [`jq`](https:
 
 ```shell
 $ url_metadata get "https://click.palletsprojects.com/en/7.x/arguments/" \
-    | jq -r '.[] | .text_summary' | head -n5
+    | jq -r '.[] | .html_summary' | lynx -stdin -dump | head -n 5
 Arguments
-Arguments work similarly to options but are positional.
-They also only support a subset of the features of options due to their
-syntactical nature. Click will also not attempt to document arguments for
-you and wants you to document them manually
+
+   Arguments work similarly to options but are positional. They also only
+   support a subset of the features of options due to their syntactical
+   nature. Click will also not attempt to document arguments for you and
 ```
 
 ```shell

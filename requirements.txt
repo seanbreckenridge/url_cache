@@ -4,5 +4,6 @@ readability-lxml>=0.8.1
 backoff>=1.10.0
 beautifulsoup4>=4.9.0
 click>=7.1.2
+lxml
 requests
 logzero

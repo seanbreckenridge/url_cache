@@ -11,7 +11,6 @@ from datetime import datetime
 from typing import Optional, Union, Callable, Any, Dict, List
 
 import backoff  # type: ignore[import]
-import readability  # type: ignore[import]
 from logzero import setup_logger, formatter  # type: ignore[import]
 from lassie import Lassie, LassieError  # type: ignore[import]
 from appdirs import user_data_dir, user_log_dir  # type: ignore[import]
@@ -20,7 +19,8 @@ from requests import Session, Response, PreparedRequest
 from .exceptions import URLMetadataException, URLMetadataRequestException
 from .cache import MetadataCache
 from .model import Metadata
-from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url, html_get_text
+from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url
+from .parsing import summarize_html
 from .sites import EXTRACTORS
 from .sites.abstract import AbstractSite
 from .dir_cache import DirCacheMiss
@@ -153,8 +153,7 @@ class URLMetadataCache:
         Given a URL:
 
         Uses lassie to grab metadata
-        Parses the HTML text with readablity
-        uses bs4 to parse that text into a plaintext summary
+        Parses/minifies the HTML text with readablity/lxml
 
         Calls each enabled 'site' extractor, to extract additional information if a site matches the URL
         e.g. If this is a youtube URL, this requests youtube subtitles
@@ -186,15 +185,11 @@ class URLMetadataCache:
             and len(self._response.text) > 0  # type: ignore[unreachable]
         ):
             if self._response.status_code < 400:  # type: ignore[unreachable]
-                doc = readability.Document(self._response.text)
-                metadata.html_summary = doc.summary()
+                metadata.html_summary = summarize_html(self._response.text)
             else:
                 self.logger.warning(
                     f"Response code for {uurl} is {self._response.status_code}, skipping HTML extraction..."
                 )
-
-        if metadata.html_summary is not None:
-            metadata.text_summary = html_get_text(metadata.html_summary)
 
         # call hooks for other extractors, if the URL matches
         for ext in self.extractors:

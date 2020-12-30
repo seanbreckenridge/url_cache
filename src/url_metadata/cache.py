@@ -21,7 +21,6 @@ class MetadataCache:
         self.fields: List[Tuple[str, MetadataField]] = [
             ("info", MetadataField("metadata.json", MetadataFieldType.JSON)),
             ("html_summary", MetadataField("summary.html", MetadataFieldType.STR)),
-            ("text_summary", MetadataField("summary.txt", MetadataFieldType.STR)),
             ("subtitles", MetadataField("subtitles.srt", MetadataFieldType.STR)),
             ("timestamp", MetadataField("timestamp.txt", MetadataFieldType.DATETIME)),
         ]

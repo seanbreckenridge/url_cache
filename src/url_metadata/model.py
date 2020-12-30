@@ -11,7 +11,6 @@ class Metadata:
     URL
     Info (description, images, page metadata)
     HTML Summary
-    Text Summary
     Subtitles (from youtube)
     Timestamp (when this information was scraped)
     """
@@ -19,7 +18,6 @@ class Metadata:
     url: str
     info: Dict[str, Any]
     html_summary: Optional[str]
-    text_summary: Optional[str]
     # TODO: better representation in memory, for the .srt file?
     subtitles: Optional[str]
     timestamp: Optional[datetime]
@@ -29,7 +27,6 @@ class Metadata:
         url: str,
         info: Optional[Dict[str, Any]] = None,
         html_summary: Optional[str] = None,
-        text_summary: Optional[str] = None,
         subtitles: Optional[str] = None,
         timestamp: Optional[datetime] = None,
     ):
@@ -37,7 +34,6 @@ class Metadata:
         self.info = info or {}
         self.url = url
         self.html_summary = html_summary or None
-        self.text_summary = text_summary or None
         self.subtitles = subtitles or None
         self.timestamp = timestamp
 
@@ -46,7 +42,6 @@ class Metadata:
             "url": self.url,
             "info": self.info,
             "html_summary": self.html_summary,
-            "text_summary": self.text_summary,
             "subtitles": self.subtitles,
             "timestamp": int(self.timestamp.timestamp()) if self.timestamp else None,
         }

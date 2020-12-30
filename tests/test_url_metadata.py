@@ -31,7 +31,7 @@ tests_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_subs.yaml"))  # type: ignore
-def test_youtube_has_subtitles(ucache) -> None:  # type: ignore
+def test_youtube_has_subtitles(ucache: URLMetadataCache) -> None:
 
     # make sure subtitles download to file
     assert not ucache.in_cache(youtube_with_cc)
@@ -54,8 +54,16 @@ def test_youtube_has_subtitles(ucache) -> None:  # type: ignore
     assert "trade-off between space" in subtitles_file.read_text()
 
 
+def test_youtube_preprocessor(ucache: URLMetadataCache) -> None:
+    assert youtube_without_cc != "https://www.youtube.com/watch?v=xvQUiX26RfE"
+    assert (
+        ucache.preprocess_url(youtube_without_cc)
+        == "https://www.youtube.com/watch?v=xvQUiX26RfE"
+    )
+
+
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_no_subs.yaml"))  # type: ignore
-def test_doesnt_have_subtitles(ucache) -> None:  # type: ignore
+def test_doesnt_have_subtitles(ucache: URLMetadataCache) -> None:
     meta_resp = ucache.get(youtube_without_cc)
     # shouldnt match, is the 'corrected' preprocessed URL
     assert meta_resp.url != youtube_without_cc
@@ -76,12 +84,14 @@ skip_dl_fp = os.path.join(tests_dir, "vcr/skip_downloading_youtube_subtitles.yam
 
 
 @vcr.use_cassette(skip_dl_fp)  # type: ignore
-def test_skip_downloading_youtube_subtitles(ucache) -> None:  # type: ignore
+def test_skip_downloading_youtube_subtitles(ucache: URLMetadataCache) -> None:
 
     # see if this URL would succeed usually, download subtitles
     assert not ucache.in_cache(youtube_with_cc_skip_subs)
     meta_resp = ucache.get(youtube_with_cc_skip_subs)
+    assert meta_resp is not None
     assert ucache.in_cache(youtube_with_cc_skip_subs)
+    assert meta_resp.subtitles is not None
     assert "coda radio" in meta_resp.subtitles.casefold()
     dir_full_path = ucache.metadata_cache.dir_cache.get(youtube_with_cc_skip_subs)
 
@@ -98,15 +108,14 @@ def test_skip_downloading_youtube_subtitles(ucache) -> None:  # type: ignore
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/generic_url.yaml"))  # type: ignore
-def test_generic_url(ucache):  # type: ignore
-    meta_resp = ucache.get(github_home)
+def test_generic_url(ucache: URLMetadataCache) -> None:
+    meta_resp = ucache.get(github_home)  # type: ignore[union-attr]
     assert ucache.in_cache(github_home)
 
     # basic tests for any sort of text-based URL
     assert meta_resp.html_summary is not None
     assert isinstance(meta_resp.timestamp, datetime)
     assert meta_resp.subtitles is None
-    assert meta_resp.text_summary is not None
     assert meta_resp.info["title"].casefold().startswith("github")
 
     dir_full_path = ucache.metadata_cache.dir_cache.get(github_home)
@@ -116,15 +125,13 @@ def test_generic_url(ucache):  # type: ignore
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/test_image.yaml"))  # type: ignore
-def test_image(ucache) -> None:  # type: ignore
+def test_image(ucache: URLMetadataCache) -> None:
 
-    # test text_summary doesnt exist for image file, since it doesnt have any
     meta_resp = ucache.get(image_file)
     assert ucache.in_cache(image_file)
 
     # assert Metadata values
     assert meta_resp.html_summary is None
-    assert meta_resp.text_summary is None
     assert meta_resp.subtitles is None
     imgs: List[Dict[str, Any]] = meta_resp.info["images"]
     assert len(imgs) == 1
