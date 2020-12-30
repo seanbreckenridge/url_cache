@@ -2,6 +2,13 @@
 
 This is currently not perfect and in development, so expect changes to the API/interface. It aims to walk the line between extracting enough text/data for it to be useful, but no so much that it takes enormous amounts of space.
 
+Current TODOs:
+
+- [ ] Improve CLI interface to match all functions
+- [ ] Improve HTML/text parsing (see #6)
+- [ ] Add more sites using the [abstract interface](https://github.com/seanbreckenridge/url_metadata/blob/master/src/url_metadata/sites/abstract.py), to get more info from sites I use commonly
+- [ ] Add a preprocessing step to the sites abstract interface/URLMetadataCache functions, which 'corrects' URLs, to avoid hash mismatches
+
 A cache which saves URL metadata and summarizes content
 
 This is meant to provide more context to any of my tools which use URLs. If I [watched some youtube video](https://github.com/seanbreckenridge/mpv-sockets/blob/master/DAEMON.md) and I have a URL, I'd like to have the subtitles for it, so I can do a text-search over all the videos I've watched. If I [read an article](https://github.com/seanbreckenridge/ffexport), I want the article text! This requests, parses and abstracts away that data for me locally, so I can just do:
