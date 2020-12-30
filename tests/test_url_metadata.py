@@ -39,28 +39,30 @@ def test_youtube_has_subtitles(ucache) -> None:  # type: ignore
     assert ucache.in_cache(youtube_with_cc)
     assert isinstance(meta_resp, Metadata)
     assert meta_resp.subtitles is not None
-    assert "trade-off between space and time" in meta_resp.subtitles
+    assert "trade-off between space" in meta_resp.subtitles
 
     # make sure corresponding file exists
     dcache = ucache.metadata_cache.dir_cache
     assert isinstance(dcache, DirCache)
-    dir_full_path = dcache.get(youtube_with_cc)
+    dir_full_path = dcache.get(ucache.preprocess_url(youtube_with_cc))
     assert dir_full_path.endswith("data/2/c/7/6284b2f664f381372fab3276449b2/000")
 
     subtitles_file = Path(os.path.join(dir_full_path, "subtitles.srt"))
     assert subtitles_file.exists()
 
     # make sure subtitle is in cache dir
-    assert "trade-off between space and time" in subtitles_file.read_text()
+    assert "trade-off between space" in subtitles_file.read_text()
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_no_subs.yaml"))  # type: ignore
 def test_doesnt_have_subtitles(ucache) -> None:  # type: ignore
     meta_resp = ucache.get(youtube_without_cc)
+    # shouldnt match, is the 'corrected' preprocessed URL
+    assert meta_resp.url != youtube_without_cc
     # make sure this parsed the youtube id
     assert "xvQUiX26RfE" == get_yt_video_id(youtube_without_cc)
     assert meta_resp.subtitles is None
-    dir_full_path = ucache.metadata_cache.dir_cache.get(youtube_without_cc)
+    dir_full_path = ucache.metadata_cache.dir_cache.get(ucache.preprocess_url(youtube_without_cc))
     assert not os.path.exists(os.path.join(dir_full_path, "subtitles.srt"))
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
     # this deletes the summary files on purpose, since theyre somewhat useless

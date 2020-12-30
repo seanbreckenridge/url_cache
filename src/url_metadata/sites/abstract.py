@@ -33,6 +33,17 @@ class AbstractSite(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    def preprocess_url(self, url: str) -> str:
+        """
+        Preprocess/Restructure the URL in some way, to avoid duplicate work
+        If it doesn't apply for this URL, you can return the url as its given
+
+        For example, youtube has lots of different ways of structuring a URL
+        for a single video, but they all return the same information
+        """
+        raise NotImplementedError
+
     @property
     def response(self) -> Optional[Response]:
         return self._umc._response

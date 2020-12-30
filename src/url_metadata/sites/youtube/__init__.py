@@ -58,12 +58,6 @@ class Youtube(AbstractSite):
             if yt_id is None:
                 return metadata
             # if this matches a youtube url, download subtitles
-            # I think changing the URL is dangerous to do, might cause URL mismatches (the same URL wont be returned by cache)
-            # on the other hand, it causes duplicate downloads if GET info
-            # present in the query
-            # url = "https://www.youtube.com/watch?v={}".format(yt_id)
-            # for now, while this doesnt have some URL preprocessor to handle that (add a hook to
-            # abstract?), leave it as the user provided
             try:
                 self._umc.logger.debug(f"Downloading subtitles for Youtube ID: {yt_id}")
                 metadata.subtitles = download_subs(yt_id, self._umc.subtitle_language)
@@ -74,11 +68,20 @@ class Youtube(AbstractSite):
                 sleep(self._umc.sleep_time)
         return metadata
 
+    def preprocess_url(self, url: str) -> str:
+        yt_id: Optional[str] = get_yt_video_id(url)
+        if yt_id is None:
+            # failed, just return URL as it was
+            return url
+        else:
+            return "https://www.youtube.com/watch?v={}".format(yt_id)
+
+
     def _delete_unnecessary_info(self, metadata: Metadata) -> Metadata:
         """
         The extracted data from youtube isn't that useful, its not worth keeping
         """
-        # TODO: add as flag, to prevent this info from being deleted. I think this is fine though
+        # TODO: add as flag, to prevent this info from being deleted? I think this is fine though
         metadata.html_summary = None
         metadata.text_summary = None
         return metadata

@@ -21,7 +21,7 @@ from .exceptions import URLMetadataException, URLMetadataRequestException
 from .cache import MetadataCache
 from .model import Metadata
 from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url, html_get_text
-from .sites import PARSERS
+from .sites import EXTRACTORS
 from .sites.abstract import AbstractSite
 from .dir_cache import DirCacheMiss
 
@@ -64,7 +64,7 @@ class URLMetadataCache:
         loglevel: int = DEFAULT_LOGLEVEL,
         sleep_time: int = DEFAULT_SLEEP_TIME,
         cache_dir: Optional[Union[str, Path]] = None,
-        additional_site_parsers: Optional[List[Any]] = None,
+        additional_extractors: Optional[List[Any]] = None,
         subtitle_language: str = DEFAULT_SUBTITLE_LANGUAGE,
         skip_subtitles: bool = False,
     ) -> None:
@@ -124,16 +124,26 @@ class URLMetadataCache:
         self._response: Optional[Response] = None
 
         # initialize site-specific parsers
-        self.parser_classes = PARSERS
-        if additional_site_parsers is not None:
-            for parser in additional_site_parsers:
-                if not issubclass(parser, AbstractSite):
-                    self.logger.warning(f"{parser} is not a subclass of AbstractSite")
-                self.parser_classes.append(parser)
+        self.extractor_classes = EXTRACTORS
+        if additional_extractors is not None:
+            for extractors in additional_extractors:
+                if not issubclass(extractors, AbstractSite):
+                    self.logger.warning(f"{extractors} is not a subclass of AbstractSite")
+                self.extractor_classes.append(extractors)
 
-        self.parsers: List[AbstractSite] = [
-            asite(umc=self) for asite in self.parser_classes
+        self.extractors: List[AbstractSite] = [
+            e(umc=self) for e in self.extractor_classes
         ]
+
+    def preprocess_url(self, url: str) -> str:
+        """
+        Runs each preprocess_url function from each enabled extractor,
+        along with the default unquoting/strip
+        """
+        uurl: str = clean_url(url)
+        for extractor in self.extractors:
+            uurl = extractor.preprocess_url(uurl)
+        return uurl
 
     def request_data(self, url: str) -> Metadata:
         """
@@ -143,12 +153,12 @@ class URLMetadataCache:
         Parses the HTML text with readablity
         uses bs4 to parse that text into a plaintext summary
 
-        Calls each enabled 'site' module, to extract additional information if a site matches the URL
+        Calls each enabled 'site' extractor, to extract additional information if a site matches the URL
         e.g. If this is a youtube URL, this requests youtube subtitles
 
         returns all the requested/parsed info as a models.Metdata object
         """
-        uurl: str = clean_url(url)
+        uurl: str = self.preprocess_url(url)
         metadata = Metadata(url=uurl, timestamp=datetime.now())
 
         # set self._response, to make sure we're not using stale request information when parsing with readability
@@ -183,10 +193,10 @@ class URLMetadataCache:
         if metadata.html_summary is not None:
             metadata.text_summary = html_get_text(metadata.html_summary)
 
-        # call hooks for other parsers, if the URL matches
-        for parser in self.parsers:
-            if parser.matches_site(uurl):
-                metadata = parser.extract_info(uurl, metadata)
+        # call hooks for other extractors, if the URL matches
+        for ext in self.extractors:
+            if ext.matches_site(uurl):
+                metadata = ext.extract_info(uurl, metadata)
         return metadata
 
     @backoff.on_exception(
@@ -230,7 +240,7 @@ class URLMetadataCache:
         Save the parsed information in a local data directory
         If the URL already has cached data locally, returns that instead
         """
-        uurl: str = clean_url(url)
+        uurl: str = self.preprocess_url(url)
         if not self.in_cache(uurl):
             data: Metadata = self.request_data(uurl)
             self.metadata_cache.put(uurl, data)
@@ -246,7 +256,7 @@ class URLMetadataCache:
 
     def in_cache(self, url: str) -> bool:
         """Returns True if the URL already has cached information"""
-        uurl: str = clean_url(url)
+        uurl: str = self.preprocess_url(url)
         return self.metadata_cache.has(uurl)
 
     def get_cache_dir(self, url: str) -> Optional[str]:
@@ -254,7 +264,7 @@ class URLMetadataCache:
         If this URL is in cache, returns the location of the cache directory
         Returns None if it couldn't find a matching directory
         """
-        uurl: str = clean_url(url)
+        uurl: str = self.preprocess_url(url)
         try:
             return self.metadata_cache.dir_cache.get(uurl)
         except DirCacheMiss:
