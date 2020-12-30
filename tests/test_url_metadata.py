@@ -45,11 +45,8 @@ def test_youtube_has_subtitles(ucache) -> None:
     dir_full_path = dcache.get(youtube_with_cc)
     assert dir_full_path.endswith("data/2/c/7/6284b2f664f381372fab3276449b2/000")
 
-    # make sure _path handler map returns the correct hash/file
-    subtitles_file: Path = ucache.metadata_cache.__class__._path(
-        dir_full_path, "subtitles"
-    )
-    assert str(subtitles_file) == os.path.join(dir_full_path, "subtitles.srt")
+    subtitles_file = Path(os.path.join(dir_full_path, "subtitles.srt"))
+    assert subtitles_file.exists()
 
     # make sure subtitle is in cache dir
     assert "trade-off between space and time" in subtitles_file.read_text()

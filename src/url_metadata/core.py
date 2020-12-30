@@ -7,6 +7,7 @@ import os
 import logging
 from time import sleep
 from pathlib import Path
+from datetime import datetime
 from typing import Optional, Union, Callable, Any, Dict, List
 
 import backoff  # type: ignore[import]
@@ -147,7 +148,7 @@ class URLMetadataCache:
         returns all the requested/parsed info as a models.Metdata object
         """
         uurl: str = clean_url(url)
-        metadata = Metadata(url=uurl)
+        metadata = Metadata(url=uurl, timestamp=datetime.now())
 
         # set self._response, to make sure we're not using stale request information when parsing with readability
         self._response = None

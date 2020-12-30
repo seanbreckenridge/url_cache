@@ -2,7 +2,7 @@ import os
 import shutil
 import tempfile
 
-from url_metadata.cache import DirCache
+from url_metadata.dir_cache import DirCache
 
 
 def test_dir_cache_chaining():

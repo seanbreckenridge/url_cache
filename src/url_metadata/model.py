@@ -16,13 +16,13 @@ class Metadata:
     Timestamp (when this information was scraped)
     """
 
-    info: Dict[str, Any]
     url: str
+    info: Dict[str, Any]
     html_summary: Optional[str]
     text_summary: Optional[str]
     # TODO: better representation in memory, for the .srt file?
     subtitles: Optional[str]
-    timestamp: datetime
+    timestamp: Optional[datetime]
 
     def __init__(
         self,
@@ -39,7 +39,7 @@ class Metadata:
         self.html_summary = html_summary or None
         self.text_summary = text_summary or None
         self.subtitles = subtitles or None
-        self.timestamp = timestamp or datetime.now()
+        self.timestamp = timestamp
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -48,5 +48,5 @@ class Metadata:
             "html_summary": self.html_summary,
             "text_summary": self.text_summary,
             "subtitles": self.subtitles,
-            "timestamp": int(self.timestamp.timestamp()),
+            "timestamp": int(self.timestamp.timestamp()) if self.timestamp else None,
         }
