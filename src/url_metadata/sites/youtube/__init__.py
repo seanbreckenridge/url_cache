@@ -58,10 +58,12 @@ class Youtube(AbstractSite):
             if yt_id is None:
                 return metadata
             # if this matches a youtube url, download subtitles
-            # I think this is dangerous to do, might cause URL mismatches
+            # I think changing the URL is dangerous to do, might cause URL mismatches (the same URL wont be returned by cache)
             # on the other hand, it causes duplicate downloads if GET info
             # present in the query
             # url = "https://www.youtube.com/watch?v={}".format(yt_id)
+            # for now, while this doesnt have some URL preprocessor to handle that (add a hook to
+            # abstract?), leave it as the user provided
             try:
                 self._umc.logger.debug(f"Downloading subtitles for Youtube ID: {yt_id}")
                 metadata.subtitles = download_subs(yt_id, self._umc.subtitle_language)
