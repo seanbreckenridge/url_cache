@@ -69,6 +69,8 @@ Commands:
   list      List all cached URLs
 ```
 
+An environment variable `URL_METADATA_DIR` can be set, which changes the default metadata cache directory.
+
 ---
 
 In Python, this can be configured by using the `url_metadata.URLMetadataCache` class:

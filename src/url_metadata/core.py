@@ -83,7 +83,10 @@ class URLMetadataCache:
         if cache_dir is not None:
             cdir = normalize_path(cache_dir)
         else:
-            cdir = Path(user_data_dir("url_metadata"))
+            if "URL_METADATA_DIR" in os.environ:
+                cdir = Path(os.environ["URL_METADATA_DIR"])
+            else:
+                cdir = Path(user_data_dir("url_metadata"))
 
         if cdir.exists() and not cdir.is_dir():
             raise RuntimeError(
