@@ -129,10 +129,10 @@ class URLMetadataCache:
         # initialize site-specific parsers
         self.extractor_classes = EXTRACTORS
         if additional_extractors is not None:
-            for extractors in additional_extractors:
-                if not issubclass(extractors, AbstractSite):
-                    self.logger.warning(f"{extractors} is not a subclass of AbstractSite")
-                self.extractor_classes.append(extractors)
+            for ext in additional_extractors:
+                if not issubclass(ext, AbstractSite):
+                    self.logger.warning(f"{ext} is not a subclass of AbstractSite")
+                self.extractor_classes.append(ext)
 
         self.extractors: List[AbstractSite] = [
             e(umc=self) for e in self.extractor_classes

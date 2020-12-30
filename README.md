@@ -4,7 +4,6 @@ This is currently not perfect and in development, so expect changes to the API/i
 
 Current TODOs:
 
-- [ ] Improve CLI interface to match all functions
 - [ ] Improve HTML/text parsing (see [#6](https://github.com/seanbreckenridge/url_metadata/issues/6))
 - [ ] Add more sites using the [abstract interface](https://github.com/seanbreckenridge/url_metadata/blob/master/src/url_metadata/sites/abstract.py), to get more info from sites I use commonly
 

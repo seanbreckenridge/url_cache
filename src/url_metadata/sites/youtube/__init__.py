@@ -76,7 +76,6 @@ class Youtube(AbstractSite):
         else:
             return "https://www.youtube.com/watch?v={}".format(yt_id)
 
-
     def _delete_unnecessary_info(self, metadata: Metadata) -> Metadata:
         """
         The extracted data from youtube isn't that useful, its not worth keeping

@@ -2,6 +2,7 @@
 CLI interface to url_metadata
 """
 
+import sys
 import logging
 from json import dumps
 from pathlib import Path
@@ -115,6 +116,17 @@ def list(location: str, json: bool) -> None:
     else:
         for v in values:
             click.echo(v)
+
+
+@main.command()
+@click.argument("url", required=True)
+def in_cache(url: str) -> None:
+    """
+    Prints if a URL is already cached
+    """
+    cached = ucache.in_cache(url)  # type: ignore[union-attr]
+    click.echo(dumps({"cached": cached}))
+    sys.exit(0 if cached else 1)
 
 
 @main.command()

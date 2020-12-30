@@ -62,7 +62,9 @@ def test_doesnt_have_subtitles(ucache) -> None:  # type: ignore
     # make sure this parsed the youtube id
     assert "xvQUiX26RfE" == get_yt_video_id(youtube_without_cc)
     assert meta_resp.subtitles is None
-    dir_full_path = ucache.metadata_cache.dir_cache.get(ucache.preprocess_url(youtube_without_cc))
+    dir_full_path = ucache.metadata_cache.dir_cache.get(
+        ucache.preprocess_url(youtube_without_cc)
+    )
     assert not os.path.exists(os.path.join(dir_full_path, "subtitles.srt"))
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
     # this deletes the summary files on purpose, since theyre somewhat useless
