@@ -1,4 +1,4 @@
-[![PyPi version](https://img.shields.io/pypi/v/url_metadata.svg)](https://pypi.python.org/pypi/url_metadata) [![Python3.7|Python 3.8](https://img.shields.io/pypi/pyversions/url_metadata.svg)](https://pypi.python.org/pypi/url_metadata) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![PyPi version](https://img.shields.io/pypi/v/url_metadata.svg)](https://pypi.python.org/pypi/url_metadata) [![Python3.7|3.8|3.9](https://img.shields.io/pypi/pyversions/url_metadata.svg)](https://pypi.python.org/pypi/url_metadata) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 This is currently not perfect and in development, so expect changes to the API/interface. It aims to walk the line between extracting enough text/data for it to be useful, but no so much that it takes enormous amounts of space.
 
