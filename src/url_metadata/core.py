@@ -23,6 +23,7 @@ from .model import Metadata
 from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url, html_get_text
 from .sites import PARSERS
 from .sites.abstract import AbstractSite
+from .dir_cache import DirCacheMiss
 
 DEFAULT_LOGLEVEL = logging.WARNING
 DEFAULT_SUBTITLE_LANGUAGE = "en"
@@ -255,6 +256,6 @@ class URLMetadataCache:
         """
         uurl: str = clean_url(url)
         try:
-            return self.metadata_cache.cache.get(uurl)
-        except:
+            return self.metadata_cache.dir_cache.get(uurl)
+        except DirCacheMiss:
             return None

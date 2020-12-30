@@ -3,7 +3,7 @@ import shutil
 import tempfile
 from pathlib import Path
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Generator
 
 import pytest
 import vcr  # type: ignore[import]
@@ -14,7 +14,7 @@ from url_metadata.sites.youtube import get_yt_video_id
 
 
 @pytest.fixture()
-def ucache() -> None:  # type: ignore[misc]
+def ucache() -> Generator[URLMetadataCache, None, None]:  # type: ignore[misc]
     d: str = tempfile.mkdtemp()
     yield URLMetadataCache(cache_dir=d, sleep_time=0)
     shutil.rmtree(d)
@@ -68,9 +68,10 @@ def test_doesnt_have_subtitles(ucache) -> None:  # type: ignore
     assert not os.path.exists(os.path.join(dir_full_path, "summary.txt"))
 
 
-@vcr.use_cassette(  # type: ignore
-    os.path.join(tests_dir, "vcr/skip_downloading_youtube_subtitles.yaml")
-)
+skip_dl_fp = os.path.join(tests_dir, "vcr/skip_downloading_youtube_subtitles.yaml")
+
+
+@vcr.use_cassette(skip_dl_fp)  # type: ignore
 def test_skip_downloading_youtube_subtitles(ucache) -> None:  # type: ignore
 
     # see if this URL would succeed usually, download subtitles
