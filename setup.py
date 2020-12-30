@@ -8,8 +8,9 @@ with open("requirements.txt", "r") as f:
 with io.open("README.md", encoding="utf-8") as fo:
     long_description = fo.read()
 
+pkg = "url_metadata"
 setup(
-    name="url_metadata",
+    name=pkg,
     version="0.1.6",
     url="https://github.com/seanbreckenridge/url_metadata",
     author="Sean Breckenridge",
@@ -21,6 +22,7 @@ setup(
     packages=find_packages("src"),
     zip_safe=False,
     package_dir={"": "src"},
+    package_data={pkg: ["py.typed"]},
     install_requires=requirements,
     keywords="url cache metadata youtube subtitles",
     test_suite="tests",

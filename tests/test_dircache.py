@@ -5,7 +5,7 @@ import tempfile
 from url_metadata.dir_cache import DirCache
 
 
-def test_dir_cache_chaining():
+def test_dir_cache_chaining() -> None:
     d: str = tempfile.mkdtemp()
     dd = DirCache(d)
     k = "key1"
@@ -45,7 +45,7 @@ def test_dir_cache_chaining():
     assert not os.path.exists(d)
 
 
-def test_delete():
+def test_delete() -> None:
     # create and delete a key directory with DirCache, make sure
     # items are deleted
     d: str = tempfile.mkdtemp()

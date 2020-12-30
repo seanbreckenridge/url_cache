@@ -38,6 +38,7 @@ def test_youtube_has_subtitles(ucache) -> None:  # type: ignore
     meta_resp = ucache.get(youtube_with_cc)
     assert ucache.in_cache(youtube_with_cc)
     assert isinstance(meta_resp, Metadata)
+    assert meta_resp.subtitles is not None
     assert "trade-off between space and time" in meta_resp.subtitles
 
     # make sure corresponding file exists
@@ -109,8 +110,8 @@ def test_generic_url(ucache):  # type: ignore
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
 
 
-@vcr.use_cassette(os.path.join(tests_dir, "vcr/test_image.yaml"))
-def test_image(ucache) -> None:
+@vcr.use_cassette(os.path.join(tests_dir, "vcr/test_image.yaml"))  # type: ignore
+def test_image(ucache) -> None:  # type: ignore
 
     # test text_summary doesnt exist for image file, since it doesnt have any
     meta_resp = ucache.get(image_file)
