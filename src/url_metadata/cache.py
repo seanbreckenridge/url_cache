@@ -5,8 +5,60 @@ from typing import Optional, List, Dict, Union, Any, Tuple
 from pathlib import Path
 from enum import auto, Enum
 
-from .model import Metadata
+from .model import Metadata, Subtitles
 from .dir_cache import DirCache
+
+import srt  # type: ignore[import]
+
+
+class MetadataFieldType(Enum):
+    JSON = auto()
+    STR = auto()
+    DATETIME = auto()
+    SUBTITLES = auto()
+
+
+class MetadataField:
+    """
+    Represents one possible piece of metadata for a URL
+    For example, the JSON info, the HTML summary or the subtitles
+    """
+
+    def __init__(self, filename: str, mtype: MetadataFieldType):
+        self.filename = filename
+        self.mtype = mtype
+
+    def get(self, from_dir: str) -> Union[datetime, str, Dict[str, Any], Subtitles, None]:
+        target: str = os.path.join(from_dir, self.filename)
+        if not os.path.exists(target):
+            return None
+        with open(target, "r") as f:
+            contents = f.read()
+        if self.mtype == MetadataFieldType.JSON:
+            data: Dict[str, Any] = json.loads(contents)
+            return data
+        elif self.mtype == MetadataFieldType.STR:
+            return contents
+        elif self.mtype == MetadataFieldType.DATETIME:
+            return datetime.fromtimestamp(int(contents))
+        elif self.mtype == MetadataFieldType.SUBTITLES:
+            return list(srt.parse(contents))
+        else:
+            raise ValueError(f"Unsupported mtype of {self.mtype}")
+
+    def put(self, from_dir: str, data: Any) -> None:
+        target: str = os.path.join(from_dir, self.filename)
+        with open(target, "w") as f:
+            if self.mtype == MetadataFieldType.JSON:
+                json.dump(data, f)
+            elif self.mtype == MetadataFieldType.STR:
+                f.write(data)
+            elif self.mtype == MetadataFieldType.DATETIME:
+                f.write(str(int(data.timestamp())))
+            elif self.mtype == MetadataFieldType.SUBTITLES:
+                f.write(srt.compose(data))
+            else:
+                raise ValueError(f"Unsupported mtype of {self.mtype}")
 
 
 class MetadataCache:
@@ -21,7 +73,7 @@ class MetadataCache:
         self.fields: List[Tuple[str, MetadataField]] = [
             ("info", MetadataField("metadata.json", MetadataFieldType.JSON)),
             ("html_summary", MetadataField("summary.html", MetadataFieldType.STR)),
-            ("subtitles", MetadataField("subtitles.srt", MetadataFieldType.STR)),
+            ("subtitles", MetadataField("subtitles.srt", MetadataFieldType.SUBTITLES)),
             ("timestamp", MetadataField("timestamp.txt", MetadataFieldType.DATETIME)),
         ]
 
@@ -91,46 +143,3 @@ class MetadataCache:
         pass
 
 
-class MetadataFieldType(Enum):
-    JSON = auto()
-    STR = auto()
-    DATETIME = auto()
-
-
-class MetadataField:
-    """
-    Represents one possible piece of metadata for a URL
-    For example, the JSON info, the HTML summary or the subtitles
-    """
-
-    def __init__(self, filename: str, mtype: MetadataFieldType):
-        self.filename = filename
-        self.mtype = mtype
-
-    def get(self, from_dir: str) -> Optional[Union[datetime, str, Dict[str, Any]]]:
-        target: str = os.path.join(from_dir, self.filename)
-        if not os.path.exists(target):
-            return None
-        with open(target, "r") as f:
-            contents = f.read()
-        if self.mtype == MetadataFieldType.JSON:
-            data: Dict[str, Any] = json.loads(contents)
-            return data
-        elif self.mtype == MetadataFieldType.STR:
-            return contents
-        elif self.mtype == MetadataFieldType.DATETIME:
-            return datetime.fromtimestamp(int(contents))
-        else:
-            raise ValueError(f"Unsupported mtype of {self.mtype}")
-
-    def put(self, from_dir: str, data: Any) -> None:
-        target: str = os.path.join(from_dir, self.filename)
-        with open(target, "w") as f:
-            if self.mtype == MetadataFieldType.JSON:
-                json.dump(data, f)
-            elif self.mtype == MetadataFieldType.STR:
-                f.write(data)
-            elif self.mtype == MetadataFieldType.DATETIME:
-                f.write(str(int(data.timestamp())))
-            else:
-                raise ValueError(f"Unsupported mtype of {self.mtype}")

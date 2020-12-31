@@ -7,6 +7,7 @@ from typing import List, Dict, Any, Generator
 
 import pytest
 import vcr  # type: ignore[import]
+import srt  # type: ignore[import]
 
 from url_metadata.core import URLMetadataCache, Metadata
 from url_metadata.cache import DirCache
@@ -38,8 +39,8 @@ def test_youtube_has_subtitles(ucache: URLMetadataCache) -> None:
     meta_resp = ucache.get(youtube_with_cc)
     assert ucache.in_cache(youtube_with_cc)
     assert isinstance(meta_resp, Metadata)
-    assert meta_resp.subtitles is not None
-    assert "trade-off between space" in meta_resp.subtitles
+    assert meta_resp is not None
+    assert "trade-off between space" in srt.compose(meta_resp.subtitles)
 
     # make sure corresponding file exists
     dcache = ucache.metadata_cache.dir_cache
@@ -91,8 +92,8 @@ def test_skip_downloading_youtube_subtitles(ucache: URLMetadataCache) -> None:
     meta_resp = ucache.get(youtube_with_cc_skip_subs)
     assert meta_resp is not None
     assert ucache.in_cache(youtube_with_cc_skip_subs)
-    assert meta_resp.subtitles is not None
-    assert "coda radio" in meta_resp.subtitles.casefold()
+    assert meta_resp is not None
+    assert "coda radio" in srt.compose(meta_resp.subtitles).casefold()
     dir_full_path = ucache.metadata_cache.dir_cache.get(youtube_with_cc_skip_subs)
 
     # delete, and check its deleted
