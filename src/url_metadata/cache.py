@@ -28,7 +28,9 @@ class MetadataField:
         self.filename = filename
         self.mtype = mtype
 
-    def get(self, from_dir: str) -> Union[datetime, str, Dict[str, Any], Subtitles, None]:
+    def get(
+        self, from_dir: str
+    ) -> Union[datetime, str, Dict[str, Any], Subtitles, None]:
         target: str = os.path.join(from_dir, self.filename)
         if not os.path.exists(target):
             return None
@@ -141,5 +143,3 @@ class MetadataCache:
         """
         # TODO: implement? may not be needed
         pass
-
-

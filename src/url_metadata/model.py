@@ -6,6 +6,7 @@ import srt  # type: ignore[import]
 
 Subtitles = List[srt.Subtitle]
 
+
 @dataclass(init=False)
 class Metadata:
     """

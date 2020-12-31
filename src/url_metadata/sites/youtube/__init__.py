@@ -62,7 +62,9 @@ class Youtube(AbstractSite):
             # if this matches a youtube url, download subtitles
             try:
                 self._umc.logger.debug(f"Downloading subtitles for Youtube ID: {yt_id}")
-                metadata.subtitles = list(srt.parse(download_subs(yt_id, self._umc.subtitle_language)))
+                metadata.subtitles = list(
+                    srt.parse(download_subs(yt_id, self._umc.subtitle_language))
+                )
             except YoutubeSubtitlesException as ye:  # this catches both request and track/subtitle exceptions
                 self._umc.logger.debug(str(ye))
                 # sleep even if it failed to parse, still made the request to youtube
