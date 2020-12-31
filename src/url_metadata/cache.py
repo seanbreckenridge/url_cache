@@ -105,6 +105,10 @@ class MetadataCache:
         """
 
         # delete if already cached
+
+        # TODO: dont delete info if data has None for that value?
+        # i.e. if some website removed information, dont lose previously
+        # cached info
         if self.has(url):
             self.delete(url)
 
