@@ -21,10 +21,11 @@ def summarize_html(html_text: str) -> str:
     summary: str = doc.summary()
     # remove class/id attributes
     tree = lxml.html.fromstring(summary)
-    # clean_html replaces the top-level
-    # element with html, set it back to HTML
     ctree = cleaner.clean_html(tree)
-    ctree.tag = "html"
+    # clean_html replaces the top-level
+    # element with html, set it back to HTML if possible
+    if ctree.tag == "div":
+        ctree.tag = "html"
     html_bytes: bytes = lxml.html.tostring(ctree)
     # should html.unescape be called here? Or should that be handled
     # elsewhere/when parsing into text
