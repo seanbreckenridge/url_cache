@@ -184,7 +184,7 @@ This stores all of this information as individual files in a cache directory (us
                     └── summary.txt
 ```
 
-You're free to delete any of the directories in the cache if you want, this doesn't maintain a strict index, it uses a hash of the URL and then searches for a matching `key` file. See comments [here](https://github.com/seanbreckenridge/url_metadata/blob/master/src/url_metadata/cache.py) for implementation details.
+You're free to delete any of the directories in the cache if you want, this doesn't maintain a strict index, it uses a hash of the URL and then searches for a matching `key` file. See comments [here](https://github.com/seanbreckenridge/url_metadata/blob/a30dd272460397ab0702da934e7b4c7a9700f1c7/src/url_metadata/dir_cache.py#L32-L41) for implementation details.
 
 By default this waits 5 seconds between requests. Since all the info is cached, I use this by requesting all the info from one data source (e.g. my bookmarks, or videos I've watched recently) in a loop in the background, which saves all the information to my computer. The next time I do that same loop, it doesn't have to make any requests and it just grabs all the info from local cache.
 
