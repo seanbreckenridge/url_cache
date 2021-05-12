@@ -1,71 +1,71 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/603.1.20 (KHTML,
-        like Gecko) Version/10.1 Safari/603.1.20
-    method: HEAD
-    uri: https://i.picsum.photos/id/1000/367/267.jpg?hmac=uO9iQNujyGpqk0Ieytv_xfwbpy3ENW4PhnIZ1gsnldI
-  response:
-    body:
-      string: ''
-    headers:
-      Access-Control-Allow-Origin:
-      - '*'
-      Access-Control-Expose-Headers:
-      - Picsum-ID
-      Age:
-      - '1582854'
-      CF-Cache-Status:
-      - HIT
-      CF-RAY:
-      - 64de446c3c343af7-SJC
-      Cache-Control:
-      - public, max-age=2592000
-      Cf-Bgj:
-      - h2pri
-      Connection:
-      - keep-alive
-      Content-Disposition:
-      - inline; filename="1000-367x267.jpg"
-      Content-Type:
-      - image/jpeg
-      Date:
-      - Tue, 11 May 2021 20:48:17 GMT
-      Expect-CT:
-      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
-      NEL:
-      - '{"report_to":"cf-nel","max_age":604800}'
-      Picsum-Id:
-      - '1000'
-      Report-To:
-      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report?s=r9NRTSofmLTqS3r8DypxF726rgeSIGW98e25QysI784A9alwp4EwomFHxp4NgwfuEhttJ0O20SEAsGZJlkgDxX6wVwcB0lx6fmwhxl%2BcC5c%3D"}],"group":"cf-nel","max_age":604800}'
-      Server:
-      - cloudflare
-      Strict-Transport-Security:
-      - max-age=15552000
-      Vary:
-      - Accept-Encoding
-      Via:
-      - 1.1 varnish (Varnish/6.2)
-      - 1.1 varnish (Varnish/6.2)
-      X-Content-Type-Options:
-      - nosniff
-      X-Varnish:
-      - '685015230'
-      - '612991293'
-      alt-svc:
-      - h3-27=":443"; ma=86400, h3-28=":443"; ma=86400, h3-29=":443"; ma=86400
-      cf-request-id:
-      - 09fec917a200003af7d7885000000001
-    status:
-      code: 200
-      message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/603.1.20 (KHTML,
+            like Gecko) Version/10.1 Safari/603.1.20
+      method: HEAD
+      uri: https://i.picsum.photos/id/1000/367/267.jpg?hmac=uO9iQNujyGpqk0Ieytv_xfwbpy3ENW4PhnIZ1gsnldI
+    response:
+      body:
+        string: ""
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Picsum-ID
+        Age:
+          - "1582854"
+        CF-Cache-Status:
+          - HIT
+        CF-RAY:
+          - 64de446c3c343af7-SJC
+        Cache-Control:
+          - public, max-age=2592000
+        Cf-Bgj:
+          - h2pri
+        Connection:
+          - keep-alive
+        Content-Disposition:
+          - inline; filename="1000-367x267.jpg"
+        Content-Type:
+          - image/jpeg
+        Date:
+          - Tue, 11 May 2021 20:48:17 GMT
+        Expect-CT:
+          - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+        NEL:
+          - '{"report_to":"cf-nel","max_age":604800}'
+        Picsum-Id:
+          - "1000"
+        Report-To:
+          - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report?s=r9NRTSofmLTqS3r8DypxF726rgeSIGW98e25QysI784A9alwp4EwomFHxp4NgwfuEhttJ0O20SEAsGZJlkgDxX6wVwcB0lx6fmwhxl%2BcC5c%3D"}],"group":"cf-nel","max_age":604800}'
+        Server:
+          - cloudflare
+        Strict-Transport-Security:
+          - max-age=15552000
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 varnish (Varnish/6.2)
+          - 1.1 varnish (Varnish/6.2)
+        X-Content-Type-Options:
+          - nosniff
+        X-Varnish:
+          - "685015230"
+          - "612991293"
+        alt-svc:
+          - h3-27=":443"; ma=86400, h3-28=":443"; ma=86400, h3-29=":443"; ma=86400
+        cf-request-id:
+          - 09fec917a200003af7d7885000000001
+      status:
+        code: 200
+        message: OK
 version: 1

@@ -121,7 +121,7 @@ DEFAULT_FILE_PARSERS: List[FileParser] = [
 SUMMARY_ATTRS: Set[str] = set(Summary.__annotations__.keys())
 # url is already stored as the 'key' file, don't need store again
 SUMMARY_ATTRS.remove("url")
-IGNORE_FILES: Set[str] = set(["key"])
+IGNORE_FILES: Set[str] = set(["key", "url.txt"])
 
 
 class SummaryDirCache:
@@ -145,7 +145,7 @@ class SummaryDirCache:
             parser.name: parser for parser in self.file_parsers
         }
 
-    def _parse_file(self, p: Path) -> Tuple[str, Any]:
+    def parse_file(self, p: Path) -> Tuple[str, Any]:
         """
         Takes a path and tries to parse it with each self.file_parsers
         """
@@ -155,7 +155,7 @@ class SummaryDirCache:
         # hmm - warning instead?
         raise URLCacheException(f"No way to parse {str(p)}")
 
-    def _scan_directory(self, keydir: Path) -> Dict[str, Any]:
+    def scan_directory(self, keydir: Path) -> Dict[str, Any]:
         """
         Given the target directory, recursively scans for files
         and applies the 'file_parsers' against each file
@@ -167,7 +167,7 @@ class SummaryDirCache:
             # ignore the key file, used to handle hashing/storing the URL
             if target.name in IGNORE_FILES:
                 continue
-            name, data = self._parse_file(target)
+            name, data = self.parse_file(target)
             res[name] = data
         return res
 
@@ -183,7 +183,7 @@ class SummaryDirCache:
         # store info for this in a dict and splat onto dataclass at end
         sdict: Dict[str, Any] = {"url": url}
 
-        for attr_name, data in self._scan_directory(key).items():
+        for attr_name, data in self.scan_directory(key).items():
             # top level attr on Summary dataclass
             if attr_name in SUMMARY_ATTRS:
                 sdict[attr_name] = data
@@ -245,7 +245,6 @@ class SummaryDirCache:
         # TODO: implement? may not be needed
         raise NotImplementedError
 
-    # call underlying dircache function
     def has(self, url: str) -> bool:
         """
         Returns true/false, signifying whether or not the information

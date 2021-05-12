@@ -22,7 +22,6 @@ from .model import dumps
 ucache: Optional[URLCache] = None
 
 
-
 @click.group()
 @click.option(
     "--cache-dir", type=click.Path(), help="Override default cache directory location"

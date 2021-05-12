@@ -153,3 +153,13 @@ def test_image(ucache: URLCache) -> None:
     dir_full_path = ucache.summary_cache.dir_cache.get(image_file)
     assert not os.path.exists(os.path.join(dir_full_path, "summary_html.html"))
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
+
+
+@vcr.use_cassette(os.path.join(tests_dir, "vcr/generic_url.yaml"))  # type: ignore
+def test_read_from_cache(ucache: URLCache) -> None:
+    ucache.get(github_home)
+    assert ucache.in_cache(github_home)
+
+    # this should load from file instead
+    summ_resp = ucache.get(github_home)
+

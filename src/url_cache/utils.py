@@ -9,7 +9,7 @@ import backoff  # type: ignore[import]
 def normalize_path(p: Union[str, Path]) -> Path:
     pth: Path
     if isinstance(p, Path):
-         pth = p
+        pth = p
     elif isinstance(p, str):
         pth = Path(p)
     else:

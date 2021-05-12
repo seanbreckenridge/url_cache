@@ -50,8 +50,15 @@ Classes
         
         meant to be used to 'retry' getting url metadata, incase none was retrieved
 
+    `parse_file(self, p: pathlib.Path) ‑> Tuple[str, Any]`
+    :   Takes a path and tries to parse it with each self.file_parsers
+
     `put(self, url: str, data: url_cache.model.Summary) ‑> str`
     :   Puts/Replaces the information from 'data' into the
         corresponding directory given the url
         
         Overwrites previous files/information if it exists for the URL
+
+    `scan_directory(self, keydir: pathlib.Path) ‑> Dict[str, Any]`
+    :   Given the target directory, recursively scans for files
+        and applies the 'file_parsers' against each file
