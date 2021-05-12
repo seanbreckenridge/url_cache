@@ -27,7 +27,7 @@ jobs:
           pip install '.[testing]'
       - name: Test typing; mypy
         run: |
-          mypy ./src/url_metadata ./tests
+          mypy ./src/url_summary ./tests
       - name: Run tests; pytest
         run: |
           pytest

@@ -1,25 +1,29 @@
 """
-CLI interface to url_metadata
+CLI interface
 """
 
 import sys
 import logging
-from json import dumps
+from orjson import dumps
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Any
 
 import click
 
 from .core import (
-    URLMetadataCache,
-    DEFAULT_SUBTITLE_LANGUAGE,
+    URLSummaryCache,
+    Summary,
     DEFAULT_SLEEP_TIME,
+    DEFAULT_OPTIONS,
     DEFAULT_LOGLEVEL,
 )
-from .core import Metadata
 
 # cache object for all commands
-ucache: Optional[URLMetadataCache] = None
+ucache: Optional[URLSummaryCache] = None
+
+
+def summary_dumps(data: Any) -> str:
+    return dumps(data).decode("utf-8")
 
 
 @click.group()
@@ -38,13 +42,13 @@ ucache: Optional[URLMetadataCache] = None
 @click.option(
     "--skip-subtitles",
     is_flag=True,
-    default=False,
+    default=DEFAULT_OPTIONS["skip_subtitles"],
     help="Don't attempt to download subtitles",
 )
 @click.option(
     "--subtitle-language",
     type=str,
-    default=DEFAULT_SUBTITLE_LANGUAGE,
+    default=DEFAULT_OPTIONS["subtitle_language"],
     help="Subtitle language for Youtube captions",
 )
 def main(
@@ -55,12 +59,14 @@ def main(
     subtitle_language: str,
 ) -> None:
     global ucache
-    ucache = URLMetadataCache(
+    ucache = URLSummaryCache(
         loglevel=logging.DEBUG if debug else DEFAULT_LOGLEVEL,
-        subtitle_language=subtitle_language,
-        skip_subtitles=skip_subtitles,
         sleep_time=sleep_time,
         cache_dir=cache_dir,
+        options={
+            "subtitle_language": subtitle_language,
+            "skip_subtitles": skip_subtitles,
+        },
     )
 
 
@@ -79,11 +85,11 @@ def get(quiet: bool, url: str) -> None:
 
     Prints results as JSON
     """
-    minfo_list: List[Metadata] = []
+    sinfo_list: List[Summary] = []
     for u in url:
-        minfo_list.append(ucache.get(u))  # type: ignore[union-attr]
+        sinfo_list.append(ucache.get(u))  # type: ignore[union-attr]
     if not quiet:
-        click.echo(dumps([m.to_dict() for m in minfo_list]))
+        click.echo(summary_dumps(sinfo_list))
 
 
 def list_keys(cache_dir: Path) -> List[Path]:
@@ -112,7 +118,7 @@ def list(location: str, json: bool) -> None:
         for p in keyfiles:
             values.append(p.read_text().strip())
     if json:
-        click.echo(dumps(values))
+        click.echo(summary_dumps(values))
     else:
         for v in values:
             click.echo(v)
@@ -125,7 +131,7 @@ def in_cache(url: str) -> None:
     Prints if a URL is already cached
     """
     cached = ucache.in_cache(url)  # type: ignore[union-attr]
-    click.echo(dumps({"cached": cached}))
+    click.echo(summary_dumps({"cached": cached}))
     sys.exit(0 if cached else 1)
 
 
@@ -133,10 +139,10 @@ def in_cache(url: str) -> None:
 def export() -> None:
     """Print all cached information as JSON"""
     keyfiles: List[Path] = list_keys(ucache.cache_dir)  # type: ignore[union-attr]
-    minfo_list: List[Metadata] = []
+    sinfo_list: List[Summary] = []
     for k in keyfiles:
-        minfo_list.append(ucache.get(k.read_text()))  # type: ignore[union-attr]
-    click.echo(dumps([m.to_dict() for m in minfo_list]))
+        sinfo_list.append(ucache.get(k.read_text()))  # type: ignore[union-attr]
+    click.echo(summary_dumps(sinfo_list))
 
 
 @main.command()
@@ -146,4 +152,4 @@ def cachedir() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(prog_name=__package__)

@@ -7,12 +7,14 @@ import backoff  # type: ignore[import]
 
 
 def normalize_path(p: Union[str, Path]) -> Path:
+    pth: Path
     if isinstance(p, Path):
-        return p
+         pth = p
     elif isinstance(p, str):
-        return Path(p).expanduser().absolute()
+        pth = Path(p)
     else:
         raise TypeError("Expected 'str' or 'pathlib.Path', received {}".format(type(p)))
+    return pth.expanduser().absolute()
 
 
 def fibo_backoff() -> Iterator[int]:

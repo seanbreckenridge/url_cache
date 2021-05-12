@@ -17,18 +17,16 @@ interactions:
     body:
       string: ''
     headers:
-      Accept-Ranges:
-      - bytes
       Access-Control-Allow-Origin:
       - '*'
       Access-Control-Expose-Headers:
       - Picsum-ID
       Age:
-      - '2414470'
+      - '1582854'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5dc5a4ec4c03025a-SJC
+      - 64de446c3c343af7-SJC
       Cache-Control:
       - public, max-age=2592000
       Cf-Bgj:
@@ -37,21 +35,20 @@ interactions:
       - keep-alive
       Content-Disposition:
       - inline; filename="1000-367x267.jpg"
-      Content-Length:
-      - '12339'
       Content-Type:
       - image/jpeg
       Date:
-      - Sat, 03 Oct 2020 09:30:24 GMT
+      - Tue, 11 May 2021 20:48:17 GMT
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      NEL:
+      - '{"report_to":"cf-nel","max_age":604800}'
       Picsum-Id:
       - '1000'
+      Report-To:
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report?s=r9NRTSofmLTqS3r8DypxF726rgeSIGW98e25QysI784A9alwp4EwomFHxp4NgwfuEhttJ0O20SEAsGZJlkgDxX6wVwcB0lx6fmwhxl%2BcC5c%3D"}],"group":"cf-nel","max_age":604800}'
       Server:
       - cloudflare
-      Set-Cookie:
-      - __cfduid=da8411d951a6a9caaccbf5e8c3317e8001601717424; expires=Mon, 02-Nov-20
-        09:30:24 GMT; path=/; domain=.picsum.photos; HttpOnly; SameSite=Lax; Secure
       Strict-Transport-Security:
       - max-age=15552000
       Vary:
@@ -62,12 +59,12 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       X-Varnish:
-      - 13731396 3113993
-      - '1904275'
+      - '685015230'
+      - '612991293'
       alt-svc:
       - h3-27=":443"; ma=86400, h3-28=":443"; ma=86400, h3-29=":443"; ma=86400
       cf-request-id:
-      - 058f6567ad0000025a461ab200000001
+      - 09fec917a200003af7d7885000000001
     status:
       code: 200
       message: OK

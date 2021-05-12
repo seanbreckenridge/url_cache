@@ -194,9 +194,9 @@ Originally created for [`HPI`](https://github.com/seanbreckenridge/HPI).
 
 ### Testing
 
-    git clone 'https://github.com/seanbreckenridge/url_metadata'
-    cd ./url_metadata
+    git clone 'https://github.com/seanbreckenridge/url_summary'
+    cd ./url_summary
     git submodule update --init
     pip install '.[testing]'
-    mypy ./src/url_metadata/
+    mypy ./src/url_summary/
     pytest
