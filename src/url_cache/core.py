@@ -41,7 +41,6 @@ DEFAULT_OPTIONS: Options = {
     "summarize_html": True,
 }
 
-
 class URLCache:
     def __init__(
         self,

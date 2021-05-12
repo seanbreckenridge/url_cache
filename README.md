@@ -71,21 +71,26 @@ For more information, see [the docs](./docs/url_cache/core.md)
 The CLI interface provides some utility commands to get/list information from the cache.
 
 ```
-$ url_cache --help
 Usage: url_cache [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  --cache-dir PATH          Override default cache directory location
-  --debug / --no-debug      Increase log verbosity
-  --sleep-time INTEGER      How long to sleep between requests
-  --skip-subtitles          Don't attempt to download subtitles
-  --subtitle-language TEXT  Subtitle language for Youtube captions
-  --help                    Show this message and exit.
+  --cache-dir PATH                Override default cache directory location
+  --debug / --no-debug            Increase log verbosity
+  --sleep-time INTEGER            How long to sleep between requests
+  --summarize-html / --no-summarize-html
+                                  Use readability to summarize html. Otherwise
+                                  saves the entire HTML document
+
+  --skip-subtitles / --no-skip-subtitles
+                                  Skip downloading Youtube Subtitles
+  --subtitle-language TEXT        Subtitle language for Youtube Subtitles
+  --help                          Show this message and exit.
 
 Commands:
   cachedir  Prints the location of the local cache directory
   export    Print all cached information as JSON
   get       Get information for one or more URLs Prints results as JSON
+  in-cache  Prints if a URL is already cached
   list      List all cached URLs
 ```
 

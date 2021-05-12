@@ -104,7 +104,6 @@ def test_skip_downloading_youtube_subtitles(ucache: URLCache) -> None:
     shutil.rmtree(dir_full_path)
     assert not ucache.in_cache(youtube_with_cc_skip_subs)
 
-    # this is just set in __init__, is the same
     ucache.options["skip_subtitles"] = True
 
     # make sure we didnt get any subtitles

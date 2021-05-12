@@ -5,7 +5,7 @@ CLI interface
 import sys
 import logging
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Callable, Dict
 
 import click
 
@@ -21,6 +21,38 @@ from .model import dumps
 # cache object for all commands
 ucache: Optional[URLCache] = None
 
+OPTIONS_HELP: Dict[str, str] = {
+    "subtitle_language": "Subtitle language for Youtube Subtitles",
+    "skip_subtitles": "Skip downloading Youtube Subtitles",
+    "summarize_html": "Use readability to summarize html. Otherwise saves the entire HTML document",
+}
+
+
+def _apply_option_flags(func: Callable[..., None]) -> Callable[..., None]:
+    """
+    dynamically create click flags for each item in DEFAULT_OPTIONS
+    """
+    for key, val in DEFAULT_OPTIONS.items():
+        flag_content = key.casefold().replace("_", "-")
+        is_flag = type(val) == bool
+        # create boolean flag if this is a on-off switch
+        if is_flag:
+            flag = f"--{flag_content}/--no-{flag_content}"
+        else:
+            flag = f"--{flag_content}"
+        # supply key to the click option to specify target function
+        # that string is then extracted below from the kwargs of main
+        click_func = click.option(
+            flag,
+            key,
+            is_flag=is_flag,
+            default=val,
+            required=False,
+            help=OPTIONS_HELP[key],
+        )
+        func = click_func(func)  # apply decorator
+    return func
+
 
 @click.group()
 @click.option(
@@ -35,34 +67,16 @@ ucache: Optional[URLCache] = None
     default=DEFAULT_SLEEP_TIME,
     help="How long to sleep between requests",
 )
-@click.option(
-    "--skip-subtitles",
-    is_flag=True,
-    default=DEFAULT_OPTIONS["skip_subtitles"],
-    help="Don't attempt to download subtitles",
-)
-@click.option(
-    "--subtitle-language",
-    type=str,
-    default=DEFAULT_OPTIONS["subtitle_language"],
-    help="Subtitle language for Youtube captions",
-)
-def main(
-    cache_dir: str,
-    debug: bool,
-    sleep_time: int,
-    skip_subtitles: bool,
-    subtitle_language: str,
-) -> None:
+@_apply_option_flags
+def main(cache_dir: str, debug: bool, sleep_time: int, **kwargs: bool) -> None:
     global ucache
+    # dynamically grab these from kwargs -- are created by _apply_option_flags
+    options = {key: kwargs[key] for key in DEFAULT_OPTIONS.keys()}
     ucache = URLCache(
         loglevel=logging.DEBUG if debug else DEFAULT_LOGLEVEL,
         sleep_time=sleep_time,
         cache_dir=cache_dir,
-        options={
-            "subtitle_language": subtitle_language,
-            "skip_subtitles": skip_subtitles,
-        },
+        options=options,
     )
 
 
