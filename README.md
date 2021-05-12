@@ -59,53 +59,7 @@ An environment variable `URL_METADATA_DIR` can be set, which changes the default
 
 ---
 
-In Python, this can be configured by using the `url_cache.URLMetadataCache` class:
-
-```python
-url_cache.URLMetadataCache(loglevel: int = 30,
-                            subtitle_language: str = 'en',
-                            sleep_time: int = 5,
-                            skip_subtitles: bool = False,
-                            cache_dir: Optional[str, pathlib.Path] = None):
-    """
-    Main interface to the library
-
-    subtitle_language: for youtube subtitle requests
-    sleep_time: time to wait between HTTP requests
-    skip_subtitles: don't attempt to download youtube subtitles
-    cache_dir: location the store cached data
-               uses default user cache directory if not provided
-    """
-
-get(self, url: str) -> url_cache.model.Metadata
-    """
-    Gets metadata/summary for a URL
-    Save the parsed information in a local data directory
-    If the URL already has cached data locally, returns that instead
-    """
-
-get_cache_dir(self, url: str) -> Optional[str]
-    """
-    If this URL is in cache, returns the location of the cache directory
-    Returns None if it couldn't find a matching directory
-    """
-
-in_cache(self, url: str) -> bool
-    """
-    Returns True if the URL already has cached information
-    """
-
-request_data(self, url: str) -> url_cache.model.Metadata
-    """
-    Given a URL:
-
-    If this is a youtube URL, this requests youtube subtitles
-    Uses lassie to grab metadata
-    Parses/minifies the HTML text with readablity
-    """
-```
-
-For example:
+In Python, this can be configured by using the `url_cache.URLCache` class: For example:
 
 ```python
 import logging
@@ -119,6 +73,8 @@ c = cache.get("https://github.com/seanbreckenridge/url_cache")
 # just request information, don't read/save to cache
 data = cache.request_data("https://www.wikipedia.org/")
 ```
+
+For more information, see [the docs](./docs/url_cache/core.md)
 
 ### CLI Examples
 

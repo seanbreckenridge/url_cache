@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 
 from .common import Json
 
+import orjson  # type: ignore[import]
+
 
 @dataclass
 class Summary:
@@ -24,3 +26,10 @@ class Summary:
     metadata: Json = field(default_factory=dict)
     html_summary: Optional[str] = None
     timestamp: Optional[datetime] = None
+
+
+def dumps(data: Any) -> str:
+    """
+    Dump a Summary object to JSON
+    """
+    return orjson.dumps(data).decode("utf-8")

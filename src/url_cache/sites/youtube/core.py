@@ -7,8 +7,6 @@ from .subtitles_downloader import YoutubeSubtitlesException, download_subs  # ty
 from ...model import Summary
 from ..abstract import AbstractSite
 
-import srt  # type: ignore[import]
-
 # https://gist.github.com/kmonsoor/2a1afba4ee127cce50a0
 @lru_cache(maxsize=None)
 def get_yt_video_id(url: str) -> Optional[str]:
@@ -62,11 +60,7 @@ class Youtube(AbstractSite):
             # if this matches a youtube url, download subtitles
             try:
                 self.logger.debug(f"Downloading subtitles for Youtube ID: {yt_id}")
-                summary.data["subtitles"] = list(
-                    srt.parse(
-                        download_subs(yt_id, self._uc.options["subtitle_language"])
-                    )
-                )
+                summary.data["subtitles"] = download_subs(yt_id, self._uc.options["subtitle_language"])
             except YoutubeSubtitlesException as ye:  # this catches both request and track/subtitle exceptions
                 self.logger.debug(str(ye))
                 # sleep even if it failed to parse, still made the request to youtube

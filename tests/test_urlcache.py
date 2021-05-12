@@ -7,7 +7,6 @@ from typing import List, Dict, Any, Generator
 
 import pytest
 import vcr  # type: ignore[import]
-import srt  # type: ignore[import]
 
 from url_cache.core import URLCache, Summary
 from url_cache.summary_cache import DirCache
@@ -41,7 +40,7 @@ def test_youtube_has_subtitles(ucache: URLCache) -> None:
     assert isinstance(summ_resp, Summary)
     assert summ_resp is not None
     assert summ_resp.data is not None and "subtitles" in summ_resp.data
-    assert "trade-off between space" in srt.compose(summ_resp.data["subtitles"])
+    assert "trade-off between space" in summ_resp.data["subtitles"]
 
     # make sure corresponding file exists
     dcache = ucache.summary_cache.dir_cache
@@ -72,7 +71,8 @@ def test_doesnt_have_subtitles(ucache: URLCache) -> None:
     # make sure this parsed the youtube id
     assert "xvQUiX26RfE" == get_yt_video_id(youtube_without_cc)
     assert summ_resp.data is not None
-    assert summ_resp.html_summary is None  # deleted for youtube by the site-specific extractor
+    # deleted for youtube by the site-specific extractor
+    assert summ_resp.html_summary is None
     assert "subtitles" not in summ_resp.data
     dir_full_path = ucache.summary_cache.dir_cache.get(
         ucache.preprocess_url(youtube_without_cc)
@@ -97,7 +97,7 @@ def test_skip_downloading_youtube_subtitles(ucache: URLCache) -> None:
     assert summ_resp is not None
     assert summ_resp.data is not None
     assert "subtitles" in summ_resp.data
-    assert "coda radio" in srt.compose(summ_resp.data["subtitles"]).casefold()
+    assert "coda radio" in summ_resp.data["subtitles"].casefold()
     dir_full_path = ucache.summary_cache.dir_cache.get(youtube_with_cc_skip_subs)
 
     # delete, and check its deleted
@@ -128,9 +128,11 @@ def test_generic_url(ucache: URLCache) -> None:
     # make sure subtitles file doesn't exist for item which doesnt have subtitle
     assert not os.path.exists(os.path.join(dir_full_path, "data", "subtitles.srt"))
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
-    assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
-    assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
-    assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
+    assert os.path.exists(os.path.join(dir_full_path, "html_summary.html"))
+    assert os.path.exists(os.path.join(dir_full_path, "timestamp.datetime.txt"))
+    # url file shouldnt exist, that is stored in key
+    assert not os.path.exists(os.path.join(dir_full_path, "url.txt"))
+    assert os.path.exists(os.path.join(dir_full_path, "key"))
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/test_image.yaml"))  # type: ignore

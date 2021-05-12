@@ -3,7 +3,6 @@ lassie>=0.11.9
 readability-lxml>=0.8.1
 backoff>=1.10.0
 click>=7.1.2
-srt
 requests
 logzero
 orjson

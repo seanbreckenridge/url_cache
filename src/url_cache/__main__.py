@@ -4,7 +4,6 @@ CLI interface
 
 import sys
 import logging
-from orjson import dumps
 from pathlib import Path
 from typing import List, Optional, Any
 
@@ -17,13 +16,11 @@ from .core import (
     DEFAULT_OPTIONS,
     DEFAULT_LOGLEVEL,
 )
+from .model import dumps
 
 # cache object for all commands
 ucache: Optional[URLCache] = None
 
-
-def summary_dumps(data: Any) -> str:
-    return dumps(data).decode("utf-8")
 
 
 @click.group()
@@ -89,7 +86,7 @@ def get(quiet: bool, url: str) -> None:
     for u in url:
         sinfo_list.append(ucache.get(u))  # type: ignore[union-attr]
     if not quiet:
-        click.echo(summary_dumps(sinfo_list))
+        click.echo(dumps(sinfo_list))
 
 
 def list_keys(cache_dir: Path) -> List[Path]:
@@ -118,7 +115,7 @@ def list(location: str, json: bool) -> None:
         for p in keyfiles:
             values.append(p.read_text().strip())
     if json:
-        click.echo(summary_dumps(values))
+        click.echo(dumps(values))
     else:
         for v in values:
             click.echo(v)
@@ -131,7 +128,7 @@ def in_cache(url: str) -> None:
     Prints if a URL is already cached
     """
     cached = ucache.in_cache(url)  # type: ignore[union-attr]
-    click.echo(summary_dumps({"cached": cached}))
+    click.echo(dumps({"cached": cached}))
     sys.exit(0 if cached else 1)
 
 
@@ -142,7 +139,7 @@ def export() -> None:
     sinfo_list: List[Summary] = []
     for k in keyfiles:
         sinfo_list.append(ucache.get(k.read_text()))  # type: ignore[union-attr]
-    click.echo(summary_dumps(sinfo_list))
+    click.echo(dumps(sinfo_list))
 
 
 @main.command()

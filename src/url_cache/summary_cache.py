@@ -79,10 +79,6 @@ def _load_file_text(p: Path) -> str:
     return p.read_text()
 
 
-def _load_file_subtitles(p: Path) -> List[srt.Subtitle]:
-    return list(srt.parse(p.read_text()))
-
-
 def _load_file_datetime(p: Path) -> datetime:
     return datetime.fromtimestamp(int(p.read_text()))
 
@@ -97,21 +93,11 @@ def _dump_file_text(data: str, p: Path) -> None:
     p.write_text(data)
 
 
-def _dump_file_subtitles(data: List[srt.Subtitle], p: Path) -> None:
-    p.write_text(srt.compose(data))
-
-
 def _dump_file_datetime(data: datetime, p: Path) -> None:
     p.write_text(str(int(data.timestamp())))
 
 
 DEFAULT_FILE_PARSERS: List[FileParser] = [
-    FileParser(
-        name="url",
-        ext=".txt",
-        load_func=_load_file_text,
-        dump_func=_dump_file_text,
-    ),
     FileParser(
         name="metadata",
         ext=".json",
@@ -133,13 +119,16 @@ DEFAULT_FILE_PARSERS: List[FileParser] = [
     FileParser(
         name="subtitles",
         ext=".srt",
-        load_func=_load_file_subtitles,
-        dump_func=_dump_file_subtitles,
+        load_func=_load_file_text,
+        dump_func=_dump_file_text,
     ),
 ]
 
 
 SUMMARY_ATTRS: Set[str] = set(Summary.__annotations__.keys())
+# url is already stored as the 'key' file, don't need store again
+SUMMARY_ATTRS.remove("url")
+IGNORE_FILES: Set[str] = set(["key"])
 
 
 class SummaryDirCache:
@@ -163,11 +152,10 @@ class SummaryDirCache:
             parser.name: parser for parser in self.file_parsers
         }
 
-    @staticmethod
-    def _toplevel_attr(attr: str) -> bool:
-        return attr in SUMMARY_ATTRS
-
     def _parse_file(self, p: Path) -> Tuple[str, Any]:
+        """
+        Takes a path and tries to parse it with each self.file_parsers
+        """
         for parser in self.file_parsers:
             if parser.matches(p):
                 return parser.name, parser.load(p)
@@ -184,7 +172,7 @@ class SummaryDirCache:
             if not target.is_file():
                 continue
             # ignore the key file, used to handle hashing/storing the URL
-            if target.name == "key":
+            if target.name in IGNORE_FILES:
                 continue
             name, data = self._parse_file(target)
             res[name] = data
@@ -192,7 +180,7 @@ class SummaryDirCache:
 
     def get(self, url: str) -> Optional[Summary]:
         """
-        Get data for the 'url' from cache, or None
+        Get data for the 'url' from cache, or None if it doesn't exist
         """
         if not self.has(url):
             return None
@@ -202,40 +190,32 @@ class SummaryDirCache:
         # store info for this in a dict and splat onto dataclass at end
         sdict: Dict[str, Any] = {"url": url}
 
-        for name, data in self._scan_directory(key).items():
+        for attr_name, data in self._scan_directory(key).items():
             # top level attr on Summary dataclass
-            if self.__class__._toplevel_attr(name):
-                sdict[name] = data
+            if attr_name in SUMMARY_ATTRS:
+                sdict[attr_name] = data
             else:
+                # some additional data (e.g. subtitles), attach to 'data' field
                 if "data" not in sdict:
-                    sdict["data"] = {name: data}
+                    sdict["data"] = {attr_name: data}
                 else:
-                    sdict["data"][name] = data
+                    sdict["data"][attr_name] = data
 
         return Summary(**sdict)  # type: ignore[call-arg]
 
-    def _put_helper(data: Any, target: Path, parser: FileParser) -> None:
-        pass
-
     def put(self, url: str, data: Summary) -> str:
         """
-        Replaces/puts the information from 'data' into the
+        Puts/Replaces the information from 'data' into the
         corresponding directory given the url
 
-        Deletes previous cached information, if it exists for the URL
+        Overwrites previous files/information if it exists for the URL
         """
-
-        # delete if already cached
-        #
-        # TODO: dont delete info if data has None for that value?
-        # i.e. if some website removed information, dont lose previously
-        # cached info
-        if self.has(url):
-            self.delete(url)
 
         key: Path = Path(self.dir_cache.put(url))
 
         for attr in SUMMARY_ATTRS:
+
+            # get the value from the Summary dataclass
             val: Optional[Any] = getattr(data, attr, None)
             if val is None:
                 continue
@@ -258,6 +238,8 @@ class SummaryDirCache:
 
     def has_null_value(self, url: str) -> bool:
         """
+        Currently not Implemented
+
         If the item isn't in cache, raises DirCacheMiss
         If the item is in cache, but it doesn't have any values (i.e. empty
         json file and no srt data), then return True
@@ -268,18 +250,12 @@ class SummaryDirCache:
         # TODO: implement? may not be needed
         raise NotImplementedError
 
-    # call underlying dircache functions
-
+    # call underlying dircache function
     def has(self, url: str) -> bool:
         """
         Returns true/false, signifying whether or not the information
         for this url is already cached
+
+        calls the underlying DirCache.exists function
         """
         return self.dir_cache.exists(url)
-
-    # not used but here as a library function, incase
-    def delete(self, url: str) -> bool:
-        """
-        Returns true if item was deleted, false if it didn't exist
-        """
-        return self.dir_cache.delete(url)
