@@ -48,7 +48,7 @@ def _apply_option_flags(func: Callable[..., None]) -> Callable[..., None]:
             is_flag=is_flag,
             default=val,
             required=False,
-            help=OPTIONS_HELP[key],
+            help=OPTIONS_HELP[key] + f" [default: {val}]",
         )
         func = click_func(func)  # apply decorator
     return func
