@@ -11,7 +11,7 @@ from typing import List, Optional, Any
 import click
 
 from .core import (
-    URLSummaryCache,
+    URLCache,
     Summary,
     DEFAULT_SLEEP_TIME,
     DEFAULT_OPTIONS,
@@ -19,7 +19,7 @@ from .core import (
 )
 
 # cache object for all commands
-ucache: Optional[URLSummaryCache] = None
+ucache: Optional[URLCache] = None
 
 
 def summary_dumps(data: Any) -> str:
@@ -59,7 +59,7 @@ def main(
     subtitle_language: str,
 ) -> None:
     global ucache
-    ucache = URLSummaryCache(
+    ucache = URLCache(
         loglevel=logging.DEBUG if debug else DEFAULT_LOGLEVEL,
         sleep_time=sleep_time,
         cache_dir=cache_dir,

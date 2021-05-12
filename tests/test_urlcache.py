@@ -9,15 +9,15 @@ import pytest
 import vcr  # type: ignore[import]
 import srt  # type: ignore[import]
 
-from url_summary.core import URLSummaryCache, Summary
-from url_summary.summary_cache import DirCache
-from url_summary.sites.youtube.core import get_yt_video_id
+from url_cache.core import URLCache, Summary
+from url_cache.summary_cache import DirCache
+from url_cache.sites.youtube.core import get_yt_video_id
 
 
 @pytest.fixture()
-def ucache() -> Generator[URLSummaryCache, None, None]:  # type: ignore[misc]
+def ucache() -> Generator[URLCache, None, None]:  # type: ignore[misc]
     d: str = tempfile.mkdtemp()
-    yield URLSummaryCache(cache_dir=d, sleep_time=0)
+    yield URLCache(cache_dir=d, sleep_time=0)
     shutil.rmtree(d)
 
 
@@ -32,7 +32,7 @@ tests_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_subs.yaml"))  # type: ignore
-def test_youtube_has_subtitles(ucache: URLSummaryCache) -> None:
+def test_youtube_has_subtitles(ucache: URLCache) -> None:
 
     # make sure subtitles download to file
     assert not ucache.in_cache(youtube_with_cc)
@@ -56,7 +56,7 @@ def test_youtube_has_subtitles(ucache: URLSummaryCache) -> None:
     assert "trade-off between space" in subtitles_file.read_text()
 
 
-def test_youtube_preprocessor(ucache: URLSummaryCache) -> None:
+def test_youtube_preprocessor(ucache: URLCache) -> None:
     assert youtube_without_cc != "https://www.youtube.com/watch?v=xvQUiX26RfE"
     assert (
         ucache.preprocess_url(youtube_without_cc)
@@ -65,7 +65,7 @@ def test_youtube_preprocessor(ucache: URLSummaryCache) -> None:
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_no_subs.yaml"))  # type: ignore
-def test_doesnt_have_subtitles(ucache: URLSummaryCache) -> None:
+def test_doesnt_have_subtitles(ucache: URLCache) -> None:
     summ_resp = ucache.get(youtube_without_cc)
     # shouldnt match, is the 'corrected' preprocessed URL
     assert summ_resp.url != youtube_without_cc
@@ -87,7 +87,7 @@ skip_dl_fp = os.path.join(tests_dir, "vcr/skip_downloading_youtube_subtitles.yam
 
 
 @vcr.use_cassette(skip_dl_fp)  # type: ignore
-def test_skip_downloading_youtube_subtitles(ucache: URLSummaryCache) -> None:
+def test_skip_downloading_youtube_subtitles(ucache: URLCache) -> None:
 
     # see if this URL would succeed usually, download subtitles
     assert not ucache.in_cache(youtube_with_cc_skip_subs)
@@ -113,7 +113,7 @@ def test_skip_downloading_youtube_subtitles(ucache: URLSummaryCache) -> None:
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/generic_url.yaml"))  # type: ignore
-def test_generic_url(ucache: URLSummaryCache) -> None:
+def test_generic_url(ucache: URLCache) -> None:
     summ_resp = ucache.get(github_home)  # type: ignore[union-attr]
     assert ucache.in_cache(github_home)
 
@@ -134,7 +134,7 @@ def test_generic_url(ucache: URLSummaryCache) -> None:
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/test_image.yaml"))  # type: ignore
-def test_image(ucache: URLSummaryCache) -> None:
+def test_image(ucache: URLCache) -> None:
 
     summ_resp = ucache.get(image_file)
     assert ucache.in_cache(image_file)

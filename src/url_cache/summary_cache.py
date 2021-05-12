@@ -17,7 +17,7 @@ from typing import (
 )
 from pathlib import Path
 
-from .exceptions import URLSummaryException
+from .exceptions import URLCacheException
 from .common import Json
 from .model import Summary
 from .dir_cache import DirCache
@@ -150,7 +150,9 @@ class SummaryDirCache:
     additional FileParser objects can be provided to parse custom data
     """
 
-    def __init__(self, data_dir: Path, file_parsers: Optional[List[FileParser]] = None):
+    def __init__(
+        self, data_dir: Path, *, file_parsers: Optional[List[FileParser]] = None
+    ):
         self.data_dir: Path = data_dir
         self.dir_cache = DirCache(str(self.data_dir))
         self.file_parsers: List[FileParser] = DEFAULT_FILE_PARSERS
@@ -170,7 +172,7 @@ class SummaryDirCache:
             if parser.matches(p):
                 return parser.name, parser.load(p)
         # hmm - warning instead?
-        raise URLSummaryException(f"No way to parse {str(p)}")
+        raise URLCacheException(f"No way to parse {str(p)}")
 
     def _scan_directory(self, keydir: Path) -> Dict[str, Any]:
         """
@@ -181,6 +183,7 @@ class SummaryDirCache:
         for target in keydir.rglob("*"):
             if not target.is_file():
                 continue
+            # ignore the key file, used to handle hashing/storing the URL
             if target.name == "key":
                 continue
             name, data = self._parse_file(target)

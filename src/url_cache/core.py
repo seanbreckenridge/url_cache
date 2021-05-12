@@ -1,5 +1,5 @@
 """
-Core functionality for url_summary, switches on the URLs to request different types of information
+Core functionality for url_cache, switches on the URLs to request different types of information
 saves that to cache. If something has already been requested, returns it from cache.
 """
 
@@ -16,8 +16,8 @@ from lassie import Lassie, LassieError  # type: ignore[import]
 from appdirs import user_data_dir, user_log_dir  # type: ignore[import]
 from requests import Session, Response, PreparedRequest
 
-from .exceptions import URLSummaryException, URLSummaryRequestException
-from .summary_cache import SummaryDirCache
+from .exceptions import URLCacheException, URLCacheRequestException
+from .summary_cache import SummaryDirCache, FileParser
 from .model import Summary
 from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url
 from .html_utils import summarize_html
@@ -28,9 +28,16 @@ from .common import Options, Json
 
 DEFAULT_SLEEP_TIME = 5
 DEFAULT_LOGLEVEL = logging.WARNING
+
+# these options more refer to site-specific
+# options, not core URLCache options -- those are
+# passed as kwargs
+
+# TODO: mypy Literal type?
 DEFAULT_OPTIONS: Options = {
     "subtitle_language": "en",
     "skip_subtitles": False,
+    "summarize_html": True,
 }
 
 
@@ -62,13 +69,15 @@ class SaveSession(Session):
         return resp
 
 
-class URLSummaryCache:
+class URLCache:
     def __init__(
         self,
+        *,
+        cache_dir: Optional[Union[str, Path]] = None,
         loglevel: int = DEFAULT_LOGLEVEL,
         sleep_time: int = DEFAULT_SLEEP_TIME,
-        cache_dir: Optional[Union[str, Path]] = None,
         additional_extractors: Optional[List[Any]] = None,
+        file_parsers: Optional[List[FileParser]] = None,
         options: Optional[Options] = None,
     ) -> None:
         """
@@ -84,10 +93,10 @@ class URLSummaryCache:
         if cache_dir is not None:
             cdir = normalize_path(cache_dir)
         else:
-            if "URL_SUMMARY_DIR" in os.environ:
-                cdir = Path(os.environ["URL_SUMMARY_DIR"])
+            if "URL_CACHE_DIR" in os.environ:
+                cdir = Path(os.environ["URL_CACHE_DIR"])
             else:
-                cdir = Path(user_data_dir("url_summary"))
+                cdir = Path(user_data_dir("url_cache"))
 
         if cdir.exists() and not cdir.is_dir():
             raise RuntimeError(
@@ -102,11 +111,12 @@ class URLSummaryCache:
         self.cache_dir: Path = self._base_cache_dir / "data"
         if not self.cache_dir.exists():
             self.cache_dir.mkdir()
-        self.summary_cache = SummaryDirCache(self.cache_dir)
+
+        self.summary_cache = SummaryDirCache(self.cache_dir, file_parsers=file_parsers)
 
         # setup logging
         self.logger: logging.Logger = setup_logger(
-            name="url_summary",
+            name="url_cache",
             level=loglevel,
             logfile=self.logpath,
             maxBytes=1e7,
@@ -179,17 +189,25 @@ class URLSummaryCache:
             lassie_metadata = self._fetch_lassie(uurl)
             if lassie_metadata is not None:
                 summary.metadata = lassie_metadata
-        except URLSummaryRequestException:
+        except URLCacheRequestException:
             # failed after waiting 13, 21, 34 seconds successively
             pass
 
         sleep(self.sleep_time)
 
-        # use readability lib to parse self._response.text
-        # if we're at this point, that should always be the latest
-        # response, see https://github.com/michaelhelmick/lassie/blob/dd525e6243a989f083534921a1a1206931e608ec/lassie/core.py#L244-L266
-        if self._response is not None and len(self._response.text) > 0:  # type: ignore[unreachable]
-            summary.html_summary = summarize_html(self._response.text)  # type: ignore[unreachable]
+        if self._response is not None:  # type: ignore[unreachable]
+            # mypy can't figure out this isn't none because of the callback
+            assert self._response is not None  # type: ignore[unreachable]
+            # use readability lib to parse self._response.text
+            # if we're at this point, that should always be the latest
+            # response, see https://github.com/michaelhelmick/lassie/blob/dd525e6243a989f083534921a1a1206931e608ec/lassie/core.py#L244-L266
+            if self.options["summarize_html"]:
+                if len(self._response.text) > 0:  # type: ignore[unreachable]
+                    summary.html_summary = summarize_html(self._response.text)  # type: ignore[unreachable]
+            else:
+                # if user overrode to specify not to summarize, save the
+                # entire html text to the summary file
+                summary.html_summary = self._response.text
 
         # call hooks for other extractors, if the URL matches
         for ext in self.extractors:
@@ -198,7 +216,7 @@ class URLSummaryCache:
         return summary
 
     @backoff.on_exception(
-        fibo_backoff, URLSummaryRequestException, max_tries=3, on_backoff=backoff_warn
+        fibo_backoff, URLCacheRequestException, max_tries=3, on_backoff=backoff_warn
     )
     def _fetch_lassie(self, url: str) -> Optional[Json]:
         self.logger.debug("Fetching metadata for {}".format(url))
@@ -210,15 +228,15 @@ class URLSummaryCache:
         except LassieError as le:
             self.logger.warning("Could not retrieve metadata from lassie: " + str(le))
         if self._response is not None and self._response.status_code == 429:
-            raise URLSummaryRequestException(
+            raise URLCacheRequestException(
                 "Received 429 for URL {}, waiting to retry...".format(url)
             )
         return None
 
     @property
     def logpath(self) -> str:
-        """Returns the path to the url_summary logfile"""
-        f = os.path.join(user_log_dir("url_summary"), "request.log")
+        """Returns the path to the url_cache logfile"""
+        f = os.path.join(user_log_dir("url_cache"), "request.log")
         os.makedirs(os.path.dirname(f), exist_ok=True)
         return f
 
@@ -246,7 +264,7 @@ class URLSummaryCache:
         # returns None if not present
         fdata: Optional[Summary] = self.summary_cache.get(uurl)
         if fdata is None:
-            raise URLSummaryException(
+            raise URLCacheException(
                 f"Failure retrieving information from cache for {url}"
             )
         else:

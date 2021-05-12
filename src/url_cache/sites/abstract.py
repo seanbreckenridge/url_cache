@@ -8,7 +8,7 @@ from ..model import Summary
 
 
 if TYPE_CHECKING:
-    from ..core import URLSummaryCache  # to prevent cyclic imports
+    from ..core import URLCache  # to prevent cyclic imports
 
 
 class AbstractSite(ABC):
@@ -17,7 +17,7 @@ class AbstractSite(ABC):
     so these have access to the cached response through self._uc
     """
 
-    def __init__(self, uc: "URLSummaryCache"):
+    def __init__(self, uc: "URLCache"):
         self._uc = uc
 
     @abstractmethod
