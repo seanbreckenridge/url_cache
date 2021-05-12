@@ -13,7 +13,9 @@ Requires `python3.7+`
 
 To install with pip, run:
 
-    pip install url_cache
+    python3 -m pip install url_cache
+
+As this is still in development, for the latest changes install from git: `python3 -m pip install git+https://github.com/seanbreckenridge/url_cache`
 
 ## Rationale
 
