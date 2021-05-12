@@ -194,7 +194,7 @@ class URLCache:
         self.logger.debug("Fetching metadata for {}".format(url))
         try:
             meta: Json = self.lassie.fetch(
-                url, handle_file_content=True, all_images=True
+                url, favicon=True, handle_file_content=True, all_images=True
             )
             return meta
         except LassieError as le:
