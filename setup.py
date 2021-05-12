@@ -1,34 +1,29 @@
-import io
-from setuptools import setup, find_packages
+from pathlib import Path
+from setuptools import setup, find_namespace_packages
 
-with open("requirements.txt", "r") as f:
-    requirements = f.read().splitlines()
-
-# Use the README.md content for the long description:
-with io.open("README.md", encoding="utf-8") as fo:
-    long_description = fo.read()
-
-pkg = "url_metadata"
+pkg = "url_cache"
 setup(
     name=pkg,
-    version="0.1.6",
-    url="https://github.com/seanbreckenridge/url_metadata",
+    version="0.0.2",
+    url="https://github.com/seanbreckenridge/url_cache",
     author="Sean Breckenridge",
     author_email="seanbrecke@gmail.com",
-    description=("""A cache which saves URL metadata and summarizes content"""),
-    long_description=long_description,
+    description=(
+        """A file system cache which saves URL metadata and summarizes content"""
+    ),
+    long_description=Path("README.md").read_text(),
     long_description_content_type="text/markdown",
     license="http://www.apache.org/licenses/LICENSE-2.0",
-    packages=find_packages("src"),
+    packages=find_namespace_packages("src"),
     zip_safe=False,
     package_dir={"": "src"},
     package_data={pkg: ["py.typed"]},
-    install_requires=requirements,
+    install_requires=Path("requirements.txt").read_text().splitlines(),
     keywords="url cache metadata youtube subtitles",
     test_suite="tests",
     entry_points={
         "console_scripts": [
-            "url_metadata = url_metadata.__main__:main",
+            "url_cache = url_cache.__main__:main",
         ]
     },
     extras_require={
