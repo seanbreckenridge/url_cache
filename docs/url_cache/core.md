@@ -6,24 +6,6 @@ saves that to cache. If something has already been requested, returns it from ca
 Classes
 -------
 
-`SaveSession(cb_func: Callable[[requests.models.Response], NoneType])`
-:   A subclass of requests.Session which runs a callback function
-    after each request.
-    
-    Allows me to expose the request objects after requests using lassie
-    
-    cb_func: A callback function which saves the response
-
-    ### Ancestors (in MRO)
-
-    * requests.sessions.Session
-    * requests.sessions.SessionRedirectMixin
-
-    ### Methods
-
-    `send(self, request: requests.models.PreparedRequest, **kwargs: bool) ‑> requests.models.Response`
-    :   Save the latest response for a requests.Session
-
 `URLCache(*, cache_dir: Union[str, pathlib.Path, NoneType] = None, loglevel: int = 30, sleep_time: int = 5, additional_extractors: Optional[List[Any]] = None, file_parsers: Optional[List[url_cache.summary_cache.FileParser]] = None, options: Optional[Dict[str, Any]] = None)`
 :   Main interface to the library
     

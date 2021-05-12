@@ -2,8 +2,6 @@
 Methods to parse HTML
 """
 
-from typing import cast
-
 import readability  # type: ignore[import]
 
 from .exceptions import URLCacheException

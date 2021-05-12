@@ -1,19 +1,14 @@
-import os
 import json
-import warnings
 from datetime import datetime
 from typing import (
     Optional,
     List,
     Dict,
-    Union,
     Any,
     Tuple,
     Callable,
     TypeVar,
-    Type,
     Set,
-    cast,
 )
 from pathlib import Path
 
@@ -21,8 +16,6 @@ from .exceptions import URLCacheException
 from .common import Json
 from .model import Summary
 from .dir_cache import DirCache
-
-import srt  # type: ignore[import]
 
 
 T = TypeVar("T")
@@ -211,7 +204,8 @@ class SummaryDirCache:
         Overwrites previous files/information if it exists for the URL
         """
 
-        key: Path = Path(self.dir_cache.put(url))
+        skey: str = self.dir_cache.put(url)
+        key: Path = Path(skey)
 
         for attr in SUMMARY_ATTRS:
 
@@ -226,7 +220,8 @@ class SummaryDirCache:
                 # put any additional data into a subdirectory in the dircache
                 assert isinstance(val, dict)
                 base /= "data"
-                base.mkdir(parents=True, exist_ok=True)
+                if val.keys():
+                    base.mkdir(parents=True, exist_ok=True)
                 for data_key, data_val in val.items():
                     psr = self.attr_file_parsers[data_key]
                     psr.dump(data_val, base / psr.filename)
@@ -234,7 +229,7 @@ class SummaryDirCache:
                 psr = self.attr_file_parsers[attr]
                 psr.dump(val, base / psr.filename)
 
-        return str(key)
+        return skey
 
     def has_null_value(self, url: str) -> bool:
         """

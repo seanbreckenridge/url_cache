@@ -5,7 +5,7 @@ CLI interface
 import sys
 import logging
 from pathlib import Path
-from typing import List, Optional, Any
+from typing import List, Optional
 
 import click
 

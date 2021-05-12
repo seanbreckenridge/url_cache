@@ -1,6 +1,5 @@
 import json
 import datetime
-from typing import Any
 
 from url_cache.model import Summary, dumps
 

@@ -1,3 +1,7 @@
+"""
+Downloads subtitles from youtube
+"""
+
 import json
 import html
 import urllib.parse

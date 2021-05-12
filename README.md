@@ -63,13 +63,13 @@ In Python, this can be configured by using the `url_cache.URLCache` class: For e
 
 ```python
 import logging
-from url_cache import URLMetadataCache
+from url_cache.core import URLCache
 
 # make requests every 2 seconds
 # debug logs
 # save to a folder in my home directory
-cache = URLMetadataCache(loglevel=logging.DEBUG, sleep_time=2, cache_dir="~/mydata")
-c = cache.get("https://github.com/seanbreckenridge/url_cache")
+cache = URLCache(loglevel=logging.DEBUG, sleep_time=2, cache_dir="~/mydata")
+c = cache.get("https://github.com/seanbreckenridge")
 # just request information, don't read/save to cache
 data = cache.request_data("https://www.wikipedia.org/")
 ```

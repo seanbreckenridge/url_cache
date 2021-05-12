@@ -9,6 +9,7 @@ Sub-modules
 * url_cache.exceptions
 * url_cache.html_utils
 * url_cache.model
+* url_cache.session
 * url_cache.sites
 * url_cache.summary_cache
 * url_cache.utils

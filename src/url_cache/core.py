@@ -8,13 +8,13 @@ import logging
 from time import sleep
 from pathlib import Path
 from datetime import datetime
-from typing import Optional, Union, Callable, Any, Dict, List
+from typing import Optional, Union, Any, List
 
 import backoff  # type: ignore[import]
 from logzero import setup_logger, formatter  # type: ignore[import]
 from lassie import Lassie, LassieError  # type: ignore[import]
 from appdirs import user_data_dir, user_log_dir  # type: ignore[import]
-from requests import Session, Response, PreparedRequest
+from requests import Response
 
 from .exceptions import URLCacheException, URLCacheRequestException
 from .summary_cache import SummaryDirCache, FileParser
@@ -25,6 +25,7 @@ from .sites.all import EXTRACTORS
 from .sites.abstract import AbstractSite
 from .dir_cache import DirCacheMiss
 from .common import Options, Json
+from .session import SaveSession
 
 DEFAULT_SLEEP_TIME = 5
 DEFAULT_LOGLEVEL = logging.WARNING
@@ -39,34 +40,6 @@ DEFAULT_OPTIONS: Options = {
     "skip_subtitles": False,
     "summarize_html": True,
 }
-
-
-class SaveSession(Session):
-    """
-    A subclass of requests.Session which runs a callback function
-    after each request.
-
-    Allows me to expose the request objects after requests using lassie
-    """
-
-    # requests.Session doesn't accept any arguments
-    def __init__(self, cb_func: Callable[[Response], None]) -> None:
-        """
-        cb_func: A callback function which saves the response
-        """
-        self.cb_func = cb_func
-        super().__init__()
-
-    # type annotations for kwargs must specify kwargs for *one* of the kwargs; quite arbitrarily chosen
-    # https://stackoverflow.com/a/37032111/9348376
-    # https://github.com/psf/requests/blob/4f6c0187150af09d085c03096504934eb91c7a9e/requests/sessions.py#L626
-    def send(self, request: PreparedRequest, **kwargs: bool) -> Response:
-        """
-        Save the latest response for a requests.Session
-        """
-        resp: Response = super().send(request, **kwargs)  # type: ignore[no-untyped-call]
-        self.cb_func(resp)
-        return resp
 
 
 class URLCache:
