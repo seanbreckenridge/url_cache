@@ -161,4 +161,3 @@ def test_read_from_cache(ucache: URLCache) -> None:
 
     # this should load from file instead
     summ_resp = ucache.get(github_home)
-

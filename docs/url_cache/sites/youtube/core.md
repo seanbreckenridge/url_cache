@@ -24,8 +24,7 @@ Classes
 -------
 
 `Youtube(uc: URLCache)`
-:   These are always run after the 'core' lassie/summarization information has been done,
-    so these have access to the cached response through self._uc
+:   Youtube site extractor to get subtitles for videos
 
     ### Ancestors (in MRO)
 

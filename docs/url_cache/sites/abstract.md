@@ -14,6 +14,7 @@ Classes
 
     ### Descendants
 
+    * url_cache.sites.stackoverflow.StackOverflow
     * url_cache.sites.youtube.core.Youtube
 
     ### Instance variables

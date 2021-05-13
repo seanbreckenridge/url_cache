@@ -9,7 +9,7 @@ Functions
 :   
 
     
-`clean_url(url: str) ‑> str`
+`clean_url(urlstr: str) ‑> str`
 :   unquotes and removes whitespace from URLs
     https://docs.python.org/3/library/urllib.parse.html#urllib.parse.unquote
 

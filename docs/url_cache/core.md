@@ -3,6 +3,13 @@ Module url_cache.core
 Core functionality for url_cache, switches on the URLs to request different types of information
 saves that to cache. If something has already been requested, returns it from cache.
 
+Functions
+---------
+
+    
+`preprocess_url(url: str) ‑> str`
+:   Shorthand to expose default preprocess url steps as a function
+
 Classes
 -------
 
@@ -36,7 +43,7 @@ Classes
     :   Runs each preprocess_url function from each enabled extractor,
         along with the default unquoting/strip
 
-    `request_data(self, url: str) ‑> url_cache.model.Summary`
+    `request_data(self, url: str, preprocess_url: bool = True) ‑> url_cache.model.Summary`
     :   Given a URL:
         
         Uses lassie to grab metadata
@@ -46,3 +53,6 @@ Classes
         e.g. If this is a youtube URL, this requests youtube subtitles
         
         returns all the requested/parsed info as a models.Summary object
+
+    `sleep(self) ‑> NoneType`
+    :

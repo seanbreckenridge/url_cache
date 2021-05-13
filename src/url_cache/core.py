@@ -5,7 +5,8 @@ saves that to cache. If something has already been requested, returns it from ca
 
 import os
 import logging
-from time import sleep
+import time
+from functools import lru_cache
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Union, Any, List
@@ -40,6 +41,7 @@ DEFAULT_OPTIONS: Options = {
     "skip_subtitles": False,
     "summarize_html": True,
 }
+
 
 class URLCache:
     def __init__(
@@ -137,7 +139,7 @@ class URLCache:
             uurl = extractor.preprocess_url(uurl)
         return uurl
 
-    def request_data(self, url: str) -> Summary:
+    def request_data(self, url: str, preprocess_url: bool = True) -> Summary:
         """
         Given a URL:
 
@@ -149,7 +151,12 @@ class URLCache:
 
         returns all the requested/parsed info as a models.Summary object
         """
-        uurl: str = self.preprocess_url(url)
+        uurl: str
+        if preprocess_url:
+            uurl = self.preprocess_url(url)
+        else:
+            uurl = url
+
         summary = Summary(url=uurl, timestamp=datetime.now())
 
         # set self._response, to make sure we're not using stale request information when parsing with readability
@@ -165,7 +172,7 @@ class URLCache:
             # failed after waiting 13, 21, 34 seconds successively
             pass
 
-        sleep(self.sleep_time)
+        self.sleep()
 
         if self._response is not None:  # type: ignore[unreachable]
             # mypy can't figure out this isn't none because of the callback
@@ -212,6 +219,9 @@ class URLCache:
         os.makedirs(os.path.dirname(f), exist_ok=True)
         return f
 
+    def sleep(self) -> None:
+        time.sleep(self.sleep_time)
+
     def _save_http_response(self, resp: Response) -> None:
         """
         callback function to save the most recent request that lassie made
@@ -257,3 +267,16 @@ class URLCache:
             return self.summary_cache.dir_cache.get(uurl)
         except DirCacheMiss:
             return None
+
+
+# helper for preprocess url
+@lru_cache(maxsize=None)
+def _url_cache_instance() -> URLCache:
+    return URLCache()
+
+
+def preprocess_url(url: str) -> str:
+    """
+    Shorthand to expose default preprocess url steps as a function
+    """
+    return _url_cache_instance().preprocess_url(url)

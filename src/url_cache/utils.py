@@ -35,9 +35,9 @@ def backoff_warn(details: Dict[str, Any]) -> None:
     warnings.warn(warning_msg)
 
 
-def clean_url(url: str) -> str:
+def clean_url(urlstr: str) -> str:
     """
     unquotes and removes whitespace from URLs
     https://docs.python.org/3/library/urllib.parse.html#urllib.parse.unquote
     """
-    return unquote(url).strip()
+    return unquote(urlstr).strip()
