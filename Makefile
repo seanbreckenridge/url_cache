@@ -13,4 +13,4 @@ docs: install
 
 test: install_testing
 	pytest
-	mypy ./src/url_cache/
+	mypy ./src/url_cache/ ./tests/

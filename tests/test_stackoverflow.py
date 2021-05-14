@@ -5,12 +5,12 @@ from url_cache.sites.stackoverflow import StackOverflow
 
 import vcr  # type: ignore[import]
 
-tests_dir = os.path.dirname(os.path.abspath(__file__))
+from .fixture import ucache, tests_dir
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/stackoverflow_redirect.yaml"))  # type: ignore
-def test_extract_question_ids() -> None:
-    s = StackOverflow(uc=URLCache(sleep_time=0))
+def test_extract_question_ids(ucache: URLCache) -> None:
+    s = StackOverflow(uc=ucache)
 
     # redirect answers to qid
     assert (

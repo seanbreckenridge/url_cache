@@ -1,23 +1,16 @@
 import os
 import shutil
-import tempfile
 from pathlib import Path
 from datetime import datetime
-from typing import List, Dict, Any, Generator
+from typing import List, Dict, Any
 
-import pytest
 import vcr  # type: ignore[import]
 
 from url_cache.core import URLCache, Summary
 from url_cache.summary_cache import DirCache
 from url_cache.sites.youtube.core import get_yt_video_id
 
-
-@pytest.fixture()
-def ucache() -> Generator[URLCache, None, None]:  # type: ignore[misc]
-    d: str = tempfile.mkdtemp()
-    yield URLCache(cache_dir=d, sleep_time=0)
-    shutil.rmtree(d)
+from .fixture import ucache, tests_dir
 
 
 # links to use; requests are cached in ./vcr/
@@ -26,8 +19,6 @@ youtube_with_cc_skip_subs = "https://www.youtube.com/watch?v=1n3NJdqzLNg"
 youtube_without_cc = "https://youtu.be/xvQUiX26RfE"
 github_home = "https://github.com"
 image_file = "https://i.picsum.photos/id/1000/367/267.jpg?hmac=uO9iQNujyGpqk0Ieytv_xfwbpy3ENW4PhnIZ1gsnldI"
-
-tests_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_subs.yaml"))  # type: ignore
@@ -160,4 +151,4 @@ def test_read_from_cache(ucache: URLCache) -> None:
     assert ucache.in_cache(github_home)
 
     # this should load from file instead
-    summ_resp = ucache.get(github_home)
+    ucache.get(github_home)
