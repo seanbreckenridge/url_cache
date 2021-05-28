@@ -9,7 +9,7 @@ from typing import Dict, Any
 
 import requests
 # TODO: use other helper funcs for better error warnings?
-from pytube.extract import video_info_url
+from pytube.extract import video_info_url  # type: ignore[import]
 
 from .srt_converter import to_srt
 
@@ -32,9 +32,6 @@ def download_subs(video_identifier: str, target_language: str) -> str:
 
 
 def get_video_info(video_id: str) -> Dict[str, Any]:
-    """Get video info. Scraping code inspired by:
-    https://github.com/syzer/youtube-captions-scraper/blob/master/src/index.js
-    """
     url = video_info_url(video_id, f"https://www.youtube.com/watch?v={video_id}")
     resp: requests.Response = requests.get(url)
     return urllib.parse.parse_qs(resp.text)
