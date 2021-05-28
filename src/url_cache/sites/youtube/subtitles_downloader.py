@@ -8,6 +8,8 @@ import urllib.parse
 from typing import Dict, Any
 
 import requests
+# TODO: use other helper funcs for better error warnings?
+from pytube.extract import video_info_url
 
 from .srt_converter import to_srt
 
@@ -33,18 +35,16 @@ def get_video_info(video_id: str) -> Dict[str, Any]:
     """Get video info. Scraping code inspired by:
     https://github.com/syzer/youtube-captions-scraper/blob/master/src/index.js
     """
-    resp: requests.Response = requests.get(
-        "https://youtube.com/get_video_info?video_id=%s&hl=en" % video_id
-    )
+    url = video_info_url(video_id, f"https://www.youtube.com/watch?v={video_id}")
+    resp: requests.Response = requests.get(url)
     return urllib.parse.parse_qs(resp.text)
 
 
 def get_sub_track_urls(video_info: Dict[str, Any]) -> Dict[str, Any]:
     try:
         video_response: Dict[str, Any] = json.loads(video_info["player_response"][0])
-        caption_tracks = video_response["captions"]["playerCaptionsTracklistRenderer"][
-            "captionTracks"
-        ]
+        captions = video_response["captions"]
+        caption_tracks = captions["playerCaptionsTracklistRenderer"]["captionTracks"]
         return {
             caption_track["languageCode"]: caption_track["baseUrl"]
             for caption_track in caption_tracks
