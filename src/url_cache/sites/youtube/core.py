@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Optional, List
 from functools import lru_cache
 from urllib.parse import urlparse, parse_qs, ParseResult
 
 from .subtitles_downloader import YoutubeSubtitlesException, download_subs  # type: ignore
 from ...model import Summary
+from ...summary_cache import FileParser, _load_file_text, _dump_file_text
 from ..abstract import AbstractSite
 
 # https://gist.github.com/kmonsoor/2a1afba4ee127cce50a0
@@ -48,6 +49,16 @@ class Youtube(AbstractSite):
     """
     Youtube site extractor to get subtitles for videos
     """
+
+    def file_parsers(self) -> List[FileParser]:
+        return [
+            FileParser(
+                name="subtitles",
+                ext=".srt",
+                load_func=_load_file_text,
+                dump_func=_dump_file_text,
+            )
+        ]
 
     def matches_site(self, url: str) -> bool:
         return get_yt_video_id(url) is not None

@@ -1,10 +1,11 @@
 import logging
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, List
 from abc import ABC, abstractmethod
 
 from requests import Response
 
 from ..model import Summary
+from ..summary_cache import FileParser
 
 
 if TYPE_CHECKING:
@@ -19,6 +20,13 @@ class AbstractSite(ABC):
 
     def __init__(self, uc: "URLCache"):
         self._uc = uc
+
+    def file_parsers(self) -> List[FileParser]:
+        """
+        Lets Sites specify custom file parsers dynamically in each Site
+        Each Site's file_parsers are added to the URLCache when its instantiated
+        """
+        return []
 
     @abstractmethod
     def matches_site(self, url: str) -> bool:  # type: ignore[misc]

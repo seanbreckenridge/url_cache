@@ -19,8 +19,7 @@ Functions
 
     
 `get_video_info(video_id: str) ‑> Dict[str, Any]`
-:   Get video info. Scraping code inspired by:
-    https://github.com/syzer/youtube-captions-scraper/blob/master/src/index.js
+:   
 
     
 `select_target_lang_track_url(track_urls: Dict[str, Any], target_language: str) ‑> str`

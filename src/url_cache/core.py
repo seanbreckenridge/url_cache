@@ -86,8 +86,6 @@ class URLCache:
         if not self.cache_dir.exists():
             self.cache_dir.mkdir()
 
-        self.summary_cache = SummaryDirCache(self.cache_dir, file_parsers=file_parsers)
-
         # setup logging
         self.logger: logging.Logger = setup_logger(
             name="url_cache",
@@ -123,6 +121,15 @@ class URLCache:
         self.extractors: List[AbstractSite] = [
             e(uc=self) for e in self.extractor_classes
         ]
+
+        # loop through each extractors file_parsers function
+        # to append custom file parsers to the summary cache
+        all_file_parsers = [] if file_parsers is None else file_parsers
+        for ext in self.extractors:
+            all_file_parsers.extend(ext.file_parsers())
+
+        self.summary_cache = SummaryDirCache(self.cache_dir, file_parsers=all_file_parsers)
+
 
     def _set_option_defaults(self) -> None:
         for key, val in DEFAULT_OPTIONS.items():

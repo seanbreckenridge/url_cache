@@ -30,6 +30,10 @@ Classes
     `extract_info(self, url: str, summary: url_cache.model.Summary) ‑> url_cache.model.Summary`
     :   Run requests, extract information from the cached response etc...
 
+    `file_parsers(self) ‑> List[url_cache.summary_cache.FileParser]`
+    :   Lets Sites specify custom file parsers dynamically in each Site
+        Each Site's file_parsers are added to the URLCache when its instantiated
+
     `matches_site(self, url: str) ‑> bool`
     :   Return a boolean describing whether or not some URL matches this site extractor
 

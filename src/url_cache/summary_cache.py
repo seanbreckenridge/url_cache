@@ -109,12 +109,6 @@ DEFAULT_FILE_PARSERS: List[FileParser] = [
         load_func=_load_file_text,
         dump_func=_dump_file_text,
     ),
-    FileParser(
-        name="subtitles",
-        ext=".srt",
-        load_func=_load_file_text,
-        dump_func=_dump_file_text,
-    ),
 ]
 
 
