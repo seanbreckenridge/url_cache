@@ -136,7 +136,7 @@ class Version4:
 
     def _extract_club(self, mal_id: int) -> MalParseResult:
         return MalParseResult(
-            cleaned=f"https://myanimelist.net/clubs?cid={mal_id}",
+            cleaned=f"https://myanimelist.net/clubs.php?cid={mal_id}",
             jikan_urls=[
                 f"{self.base}/clubs/{mal_id}",
             ],
