@@ -8,6 +8,7 @@ and creates the corresponding URLs to request for Jikan
 
 import re
 from typing import Optional, List, NamedTuple
+from functools import lru_cache
 
 from urllib.parse import urlparse, parse_qs, ParseResult
 
@@ -56,6 +57,14 @@ class MalParseResult(NamedTuple):
 
 
 class Version4:
+    """
+    Converts MyAnimeList URLs to their corresponding Jikan counterparts.
+
+    Only supports a subset of the URLs -- this doesnt support user lists
+    or pages that change very often (searches, seasonal listings, history pages)
+    as it wouldn't be as useful to cache those
+    """
+
     def __init__(self, base_url: str = JIKAN_BASE):
         self.base = base_url.rstrip("/")
 
@@ -80,6 +89,8 @@ class Version4:
                 f"{self.base}/anime/{mal_id}",
                 f"{self.base}/anime/{mal_id}/characters",
                 f"{self.base}/anime/{mal_id}/staff",
+                f"{self.base}/anime/{mal_id}/pictures",
+                f"{self.base}/anime/{mal_id}/statistics",
                 f"{self.base}/anime/{mal_id}/relations",
                 f"{self.base}/anime/{mal_id}/themes",
                 f"{self.base}/anime/{mal_id}/moreinfo",
@@ -96,6 +107,8 @@ class Version4:
                 f"{self.base}/manga/{mal_id}/relations",
                 f"{self.base}/manga/{mal_id}/moreinfo",
                 f"{self.base}/manga/{mal_id}/recommendations",
+                f"{self.base}/manga/{mal_id}/pictures",
+                f"{self.base}/manga/{mal_id}/statistics",
             ],
         )
 
@@ -105,6 +118,7 @@ class Version4:
             jikan_urls=[
                 f"{self.base}/characters/{mal_id}",
                 f"{self.base}/characters/{mal_id}/voices",
+                f"{self.base}/characters/{mal_id}/pictures",
             ],
         )
 
@@ -116,6 +130,7 @@ class Version4:
                 f"{self.base}/people/{mal_id}/anime",
                 f"{self.base}/people/{mal_id}/manga",
                 f"{self.base}/people/{mal_id}/voices",
+                f"{self.base}/people/{mal_id}/pictures",
             ],
         )
 
@@ -138,6 +153,7 @@ class Version4:
             ],
         )
 
+    @lru_cache(maxsize=2048)
     def parse_url(self, url: str) -> Optional[MalParseResult]:
         """
         Given a URL, if extra information can be extracted by requesting info from Jikan
@@ -178,6 +194,5 @@ class Version4:
             return None
 
         # TODO: parse forums posts?
-        # print(f"didnt match {url}")
 
         return None

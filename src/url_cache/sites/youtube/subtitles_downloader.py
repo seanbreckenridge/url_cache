@@ -8,6 +8,7 @@ import urllib.parse
 from typing import Dict, Any
 
 import requests
+
 # TODO: use other helper funcs for better error warnings?
 from pytube.extract import video_info_url  # type: ignore[import]
 

@@ -14,6 +14,7 @@ Classes
 
     ### Descendants
 
+    * url_cache.sites.myanimelist.core.MyAnimeList
     * url_cache.sites.stackoverflow.StackOverflow
     * url_cache.sites.youtube.core.Youtube
 
@@ -43,3 +44,6 @@ Classes
         
         For example, youtube has lots of different ways of structuring a URL
         for a single video, but they all return the same information
+
+    `sleep(self) ‑> NoneType`
+    :

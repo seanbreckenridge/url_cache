@@ -11,6 +11,8 @@ def test_succeeds() -> None:
             f"{JIKAN_BASE}/anime/{mal_id}",
             f"{JIKAN_BASE}/anime/{mal_id}/characters",
             f"{JIKAN_BASE}/anime/{mal_id}/staff",
+            f"{JIKAN_BASE}/anime/{mal_id}/pictures",
+            f"{JIKAN_BASE}/anime/{mal_id}/statistics",
             f"{JIKAN_BASE}/anime/{mal_id}/relations",
             f"{JIKAN_BASE}/anime/{mal_id}/themes",
             f"{JIKAN_BASE}/anime/{mal_id}/moreinfo",

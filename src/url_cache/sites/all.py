@@ -2,6 +2,7 @@ from typing import List, Type
 from .abstract import AbstractSite
 from .youtube.core import Youtube
 from .stackoverflow import StackOverflow
+from .myanimelist.core import MyAnimeList
 
 # As this is a namespace package, you're free to add additional files
 # to this package in a separate directory, and then append them (or override this file, by
@@ -15,4 +16,4 @@ from .stackoverflow import StackOverflow
 # https://github.com/seanbreckenridge/reorder_editable
 
 # TODO: add more site-specific extractors here
-EXTRACTORS: List[Type[AbstractSite]] = [Youtube, StackOverflow]
+EXTRACTORS: List[Type[AbstractSite]] = [Youtube, StackOverflow, MyAnimeList]

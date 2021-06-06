@@ -128,8 +128,9 @@ class URLCache:
         for ext in self.extractors:
             all_file_parsers.extend(ext.file_parsers())
 
-        self.summary_cache = SummaryDirCache(self.cache_dir, file_parsers=all_file_parsers)
-
+        self.summary_cache = SummaryDirCache(
+            self.cache_dir, file_parsers=all_file_parsers
+        )
 
     def _set_option_defaults(self) -> None:
         for key, val in DEFAULT_OPTIONS.items():

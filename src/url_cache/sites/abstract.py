@@ -58,3 +58,6 @@ class AbstractSite(ABC):
     @property
     def logger(self) -> logging.Logger:
         return self._uc.logger
+
+    def sleep(self) -> None:
+        self._uc.sleep()

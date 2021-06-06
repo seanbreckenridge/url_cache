@@ -2,10 +2,7 @@ from typing import Optional
 from urllib.parse import urlparse
 from functools import lru_cache
 
-from requests import get
-
 from .abstract import AbstractSite
-from ..model import Summary
 
 
 # TODO: support other stackexchange sites?

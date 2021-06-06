@@ -43,6 +43,8 @@ Generally, this uses:
 Site-Specific Extractors:
 
 - [Youtube](./docs/url_cache/sites/youtube/subtitles_downloader.md): to get manual/auto-generated captions (converted to a `.srt` file) from Youtube URLs
+- Stackoverflow (Just a basic URL preprocessor to reduce the possibility of conflicts/duplicate data)
+- MyAnimeList (using [Jikan v4](https://docs.api.jikan.moe/))
 
 This is meant to be extendible -- so its possible for you to write your own extractors/file loaders/dumpers (for new formats (e.g. `srt`)) for sites you use commonly and pass those to `url_cache.core.URLCache` to extract richer data for those sites. Otherwise, it saves the information from `lassie` and the summarized HTML using `readability` for each URL.
 

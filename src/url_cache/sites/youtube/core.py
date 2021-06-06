@@ -2,7 +2,7 @@ from typing import Optional, List
 from functools import lru_cache
 from urllib.parse import urlparse, parse_qs, ParseResult
 
-from .subtitles_downloader import YoutubeSubtitlesException, download_subs  # type: ignore
+from .subtitles_downloader import YoutubeSubtitlesException, download_subs
 from ...model import Summary
 from ...summary_cache import FileParser, _load_file_text, _dump_file_text
 from ..abstract import AbstractSite
@@ -63,7 +63,7 @@ class Youtube(AbstractSite):
     def matches_site(self, url: str) -> bool:
         return get_yt_video_id(url) is not None
 
-    def extract_info(self, url: str, summary: Summary) -> Summary:  # type: ignore[misc]
+    def extract_info(self, url: str, summary: Summary) -> Summary:
         summary = self._delete_unnecessary_info(summary)
         # if user didn't specify to skip trying to download subtitles
         if not self._uc.options["skip_subtitles"]:
@@ -77,12 +77,12 @@ class Youtube(AbstractSite):
                 summary.data["subtitles"] = download_subs(
                     yt_id, self._uc.options["subtitle_language"]
                 )
-                self._uc.sleep()
+                self.sleep()
             except YoutubeSubtitlesException as ye:  # this catches both request and track/subtitle exceptions
                 self.logger.debug(str(ye))
                 # sleep even if it failed to parse, still made the request to youtube
                 # won't sleep if url doesn't match youtube
-                self._uc.sleep()
+                self.sleep()
         return summary
 
     def preprocess_url(self, url: str) -> str:

@@ -1,9 +1,5 @@
-import os
-
 from url_cache.core import URLCache
 from url_cache.sites.stackoverflow import StackOverflow
-
-import vcr  # type: ignore[import]
 
 from .fixture import ucache, tests_dir
 
