@@ -27,15 +27,6 @@ class StackOverflow(AbstractSite):
             qid = parsed.path.split("/")[2]
         elif parsed.path.startswith("/questions/"):
             qid = parsed.path.split("/")[2]
-        elif parsed.path.startswith("/a/"):
-            # request this so that we redirect to the question
-            # dont use the session so this doesnt overwrite data
-            resp = get(url)
-            self._uc.sleep()
-            if resp.status_code == 200:
-                parsed = urlparse(resp.url)
-                if parsed.path.startswith("/questions/"):
-                    qid = parsed.path.split("/")[2]
         if qid.isdigit():
             return int(qid)
         return None
@@ -43,9 +34,7 @@ class StackOverflow(AbstractSite):
     def matches_site(self, url: str) -> bool:
         return self.extract_question_id(url) is not None
 
-    def extract_info(self, url: str, summary: Summary) -> Summary:
-        # TODO: add some stuff here to responses from stackoverflow question/answers?
-        return summary
+    # TODO: add an extract_info here to extract responses from stackoverflow question/answers?
 
     def preprocess_url(self, url: str) -> str:
         qid = self.extract_question_id(url)

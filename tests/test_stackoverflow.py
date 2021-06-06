@@ -8,15 +8,8 @@ import vcr  # type: ignore[import]
 from .fixture import ucache, tests_dir
 
 
-@vcr.use_cassette(os.path.join(tests_dir, "vcr/stackoverflow_redirect.yaml"))  # type: ignore
 def test_extract_question_ids(ucache: URLCache) -> None:
     s = StackOverflow(uc=ucache)
-
-    # redirect answers to qid
-    assert (
-        s.preprocess_url("https://stackoverflow.com/a/10856450/438324324923894")
-        == "https://stackoverflow.com/questions/3850022"
-    )
 
     # extract qid
     assert (

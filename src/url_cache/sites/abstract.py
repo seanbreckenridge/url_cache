@@ -35,14 +35,12 @@ class AbstractSite(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def extract_info(self, url: str, summary: Summary) -> Summary:  # type: ignore[misc]
+    def extract_info(self, url: str, summary: Summary) -> Summary:
         """
         Run requests, extract information from the cached response etc...
         """
-        raise NotImplementedError
+        return summary
 
-    @abstractmethod
     def preprocess_url(self, url: str) -> str:
         """
         Preprocess/Restructure the URL in some way, to avoid duplicate work
@@ -51,7 +49,7 @@ class AbstractSite(ABC):
         For example, youtube has lots of different ways of structuring a URL
         for a single video, but they all return the same information
         """
-        raise NotImplementedError
+        return url
 
     @property
     def response(self) -> Optional[Response]:
