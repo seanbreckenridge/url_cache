@@ -6,4 +6,5 @@ click>=7.1.2
 requests
 logzero
 orjson
-pytube
+pytube>=11.0.2
+lxml>=4.0.0

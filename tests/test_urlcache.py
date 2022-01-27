@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any
 
+import pytest
 import vcr  # type: ignore[import]
 
 from url_cache.core import URLCache, Summary
@@ -21,6 +22,7 @@ github_home = "https://github.com"
 image_file = "https://i.picsum.photos/id/1000/367/267.jpg?hmac=uO9iQNujyGpqk0Ieytv_xfwbpy3ENW4PhnIZ1gsnldI"
 
 
+@pytest.mark.skip(reason="pytube subtitles is broken, waiting on fix")
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_subs.yaml"))  # type: ignore
 def test_youtube_has_subtitles(ucache: URLCache) -> None:
 
@@ -77,6 +79,7 @@ def test_doesnt_have_subtitles(ucache: URLCache) -> None:
 skip_dl_fp = os.path.join(tests_dir, "vcr/skip_downloading_youtube_subtitles.yaml")
 
 
+@pytest.mark.skip(reason="pytube subtitles is broken, waiting on fix")
 @vcr.use_cassette(skip_dl_fp)  # type: ignore
 def test_skip_downloading_youtube_subtitles(ucache: URLCache) -> None:
 
