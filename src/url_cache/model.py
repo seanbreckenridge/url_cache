@@ -1,6 +1,6 @@
 from typing import Any, Optional
 from datetime import datetime
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, is_dataclass, asdict
 
 from .common import Json
 
@@ -28,8 +28,16 @@ class Summary:
     timestamp: Optional[datetime] = None
 
 
+def _default(o: Any) -> Any:
+    if is_dataclass(o):
+        return asdict(o)
+    elif isinstance(o, datetime):
+        return str(o)
+    raise TypeError(f"no way to serialize {o} {type(o)}")
+
+
 def dumps(data: Any) -> str:
     """
     Dump a Summary object to JSON
     """
-    return simplejson.dumps(data, namedtuple_as_object=True)
+    return simplejson.dumps(data, default=_default, namedtuple_as_object=True)
