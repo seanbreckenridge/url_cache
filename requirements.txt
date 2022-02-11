@@ -5,6 +5,6 @@ backoff>=1.10.0
 click>=7.1.2
 requests
 logzero
-orjson
+simplejson
 pytube>=11.0.2
 lxml>=4.0.0

@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 
 from .common import Json
 
-import orjson  # type: ignore[import]
+import simplejson
 
 
 @dataclass
@@ -32,4 +32,4 @@ def dumps(data: Any) -> str:
     """
     Dump a Summary object to JSON
     """
-    return orjson.dumps(data).decode("utf-8")
+    return simplejson.dumps(data, namedtuple_as_object=True)
