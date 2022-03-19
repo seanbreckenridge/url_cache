@@ -1,4 +1,4 @@
-name: Run Tests
+name: CI
 
 on:
   push:
@@ -31,3 +31,6 @@ jobs:
       - name: Run tests; pytest
         run: |
           pytest
+      - name: Lint; flake8
+        run: |
+          flake8 ./src/url_cache
