@@ -1,6 +1,6 @@
 [![PyPi version](https://img.shields.io/pypi/v/url_cache.svg)](https://pypi.python.org/pypi/url_cache) [![Python3.7|3.8|3.9](https://img.shields.io/pypi/pyversions/url_cache.svg)](https://pypi.python.org/pypi/url_cache) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-This is currently not perfect and in development, so expect changes to the API/interface. It aims to walk the line between extracting enough text/data for it to be useful, but no so much that it takes enormous amounts of space.
+This is currently very alpha and in development, so expect changes to the API/interface. It aims to walk the line between extracting enough text/data for it to be useful, but no so much that it takes enormous amounts of space.
 
 Current TODOs:
 
@@ -100,6 +100,8 @@ Commands:
 
 An environment variable `URL_CACHE_DIR` can be set, which changes the default cache directory.
 
+I've also successfully used this to cache responses from API results in some of my fprojects, by overwriting the `request_data` function. I just make a request and return a summary, and it transparently caches the rest. See [`albums/discogs_cache`](https://github.com/seanbreckenridge/albums/blob/9d296c4abb8e9e16c8dd410aeae8e5bb760008de/nextalbums/discogs_cache.py) and [`my_feed/tmdb`](https://github.com/seanbreckenridge/my_feed/blob/master/src/my_feed/sources/trakt/tmdb.py)
+
 ### CLI Examples
 
 The `get` command emits `JSON`, so it could with other tools (e.g. [`jq`](https://stedolan.github.io/jq/)) used like:
@@ -163,8 +165,11 @@ Originally created for [`HPI`](https://github.com/seanbreckenridge/HPI).
 
 ### Testing
 
-    git clone 'https://github.com/seanbreckenridge/url_cache'
-    cd ./url_cache
-    pip install '.[testing]'
-    mypy ./src/url_cache/
-    pytest
+```
+git clone 'https://github.com/seanbreckenridge/url_cache'
+cd ./url_cache
+pip install '.[testing]'
+mypy ./src/url_cache
+flake8 ./src/url_cache
+pytest
+```

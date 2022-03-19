@@ -7,7 +7,8 @@ from ...model import Summary
 from ...summary_cache import FileParser, _load_file_text, _dump_file_text
 from ..abstract import AbstractSite
 
-# https://gist.github.com/kmonsoor/2a1afba4ee127cce50a0
+
+# From: https://gist.github.com/kmonsoor/2a1afba4ee127cce50a0
 @lru_cache(maxsize=None)
 def get_yt_video_id(url: str) -> Optional[str]:
     """

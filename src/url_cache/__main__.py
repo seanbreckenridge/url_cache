@@ -25,6 +25,7 @@ OPTIONS_HELP: Dict[str, str] = {
     "subtitle_language": "Subtitle language for Youtube Subtitles",
     "skip_subtitles": "Skip downloading Youtube Subtitles",
     "summarize_html": "Use readability to summarize html. Otherwise saves the entire HTML document",
+    "expiry_duration": "Rerequest if this amount of time has elapsed since the summary was saved (e.g. 5d, 10m)",
 }
 
 
