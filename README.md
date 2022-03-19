@@ -165,8 +165,11 @@ Originally created for [`HPI`](https://github.com/seanbreckenridge/HPI).
 
 ### Testing
 
-    git clone 'https://github.com/seanbreckenridge/url_cache'
-    cd ./url_cache
-    pip install '.[testing]'
-    mypy ./src/url_cache/
-    pytest
+```
+git clone 'https://github.com/seanbreckenridge/url_cache'
+cd ./url_cache
+pip install '.[testing]'
+mypy ./src/url_cache
+flake8 ./src/url_cache
+pytest
+```
