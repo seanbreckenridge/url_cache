@@ -8,7 +8,7 @@ import logging
 import time
 from functools import lru_cache
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, Union, Any, List
 
 import backoff  # type: ignore[import]
@@ -20,7 +20,13 @@ from requests import Response
 from .exceptions import URLCacheException, URLCacheRequestException
 from .summary_cache import SummaryDirCache, FileParser
 from .model import Summary
-from .utils import normalize_path, fibo_backoff, backoff_warn, clean_url
+from .utils import (
+    normalize_path,
+    fibo_backoff,
+    backoff_warn,
+    clean_url,
+    parse_timedelta_string,
+)
 from .html_utils import summarize_html
 from .sites.all import EXTRACTORS
 from .sites.abstract import AbstractSite
@@ -40,6 +46,7 @@ DEFAULT_OPTIONS: Options = {
     "subtitle_language": "en",
     "skip_subtitles": False,
     "summarize_html": True,
+    "expiry_duration": None,
 }
 
 
@@ -91,7 +98,7 @@ class URLCache:
             name="url_cache",
             level=loglevel,
             logfile=self.logpath,
-            maxBytes=1e7,
+            maxBytes=int(1e7),
             formatter=formatter(
                 "{start}[%(levelname)-7s %(asctime)s %(name)s %(filename)s:%(lineno)d]{end} %(message)s"
             ),
@@ -101,6 +108,11 @@ class URLCache:
 
         self.options: Options = {} if options is None else options
         self._set_option_defaults()
+
+        self.expiry_duration: Optional[timedelta] = None
+        if self.options["expiry_duration"] is not None:
+            assert isinstance(self.options["expiry_duration"], str)
+            self.expiry_duration = parse_timedelta_string(self.options["expiry_duration"])
 
         ll: Lassie = Lassie()
         # hackery with a requests.Session to save the most recent request object
@@ -167,7 +179,6 @@ class URLCache:
 
         summary = Summary(url=uurl, timestamp=datetime.now())
 
-        # set self._response, to make sure we're not using stale request information when parsing with readability
         self._response = None
 
         # try to fetch metadata data with lassie, requests.Session saves the response object using a callback
@@ -261,8 +272,16 @@ class URLCache:
             raise URLCacheException(
                 f"Failure retrieving information from cache for {url}"
             )
-        else:
-            return fdata
+        elif self.expiry_duration is not None and fdata.timestamp is not None:
+            if datetime.now() - fdata.timestamp > self.expiry_duration:
+                # hmm -- only replace keys that were fetched from request_data
+                # rmtree'ing the directory means we may lose
+                # data that may be gone forever, since the website
+                # is gone now
+                data = self.request_data(uurl)
+                self.summary_cache.put(uurl, data)
+                return data
+        return fdata
 
     def in_cache(self, url: str) -> bool:
         """Returns True if the URL already has cached information"""
