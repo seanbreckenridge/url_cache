@@ -100,7 +100,10 @@ Commands:
 
 An environment variable `URL_CACHE_DIR` can be set, which changes the default cache directory.
 
-I've also successfully used this to cache responses from API results in some of my fprojects, by overwriting the `request_data` function. I just make a request and return a summary, and it transparently caches the rest. See [`albums/discogs_cache`](https://github.com/seanbreckenridge/albums/blob/9d296c4abb8e9e16c8dd410aeae8e5bb760008de/nextalbums/discogs_cache.py) and [`my_feed/tmdb`](https://github.com/seanbreckenridge/my_feed/blob/master/src/my_feed/sources/trakt/tmdb.py)
+I've also successfully used this to cache responses from API results in some of my projects, by subclassing and overriding the `request_data` function. I just make a request and return a summary, and it transparently caches the rest. See:
+
+- [`albums/discogs_cache`](https://github.com/seanbreckenridge/albums/blob/9d296c4abb8e9e16c8dd410aeae8e5bb760008de/nextalbums/discogs_cache.py)
+- [`my_feed/tmdb`](https://github.com/seanbreckenridge/my_feed/blob/master/src/my_feed/sources/trakt/tmdb.py)
 
 ### CLI Examples
 
