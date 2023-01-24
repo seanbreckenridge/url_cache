@@ -9,7 +9,7 @@ from ..abstract import AbstractSite
 
 
 # From: https://gist.github.com/kmonsoor/2a1afba4ee127cce50a0
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=32)
 def get_yt_video_id(url: str) -> Optional[str]:
     """
     Returns Video_ID extracting from the given url of Youtube
