@@ -28,7 +28,7 @@ class MyAnimeList(AbstractSite):
         self.jikan_session = requests.Session()
         self.jikan_sleep_time = 1
 
-    def file_parsers(self) -> List[FileParser]:
+    def file_parsers(self) -> List[FileParser[Json]]:
         return [
             FileParser(
                 name="jikan",
@@ -46,7 +46,7 @@ class MyAnimeList(AbstractSite):
         time.sleep(self.jikan_sleep_time)
 
     @backoff.on_exception(
-        backoff.fibo, requests.RequestException, max_tries=3, on_backoff=backoff_warn
+        backoff.fibo, requests.RequestException, max_tries=3, on_backoff=backoff_warn  # type: ignore[arg-type]
     )
     def _jikan_request(self, url: str) -> Json:
         self.logger.debug(f"Jikan Request: {url}")

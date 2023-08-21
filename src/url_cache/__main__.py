@@ -35,7 +35,7 @@ def _apply_option_flags(func: Callable[..., None]) -> Callable[..., None]:
     """
     for key, val in DEFAULT_OPTIONS.items():
         flag_content = key.casefold().replace("_", "-")
-        is_flag = type(val) == bool
+        is_flag = type(val) == bool  # noqa: E721
         # create boolean flag if this is a on-off switch
         if is_flag:
             flag = f"--{flag_content}/--no-{flag_content}"

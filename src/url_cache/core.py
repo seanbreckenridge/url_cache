@@ -9,7 +9,7 @@ import time
 from functools import lru_cache
 from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Optional, Union, Any, List
+from typing import Optional, Union, Any, List, TypeVar
 
 import backoff  # type: ignore[import]
 from logzero import setup_logger, formatter  # type: ignore[import]
@@ -49,6 +49,8 @@ DEFAULT_OPTIONS: Options = {
     "expiry_duration": None,
 }
 
+T = TypeVar("T")
+
 
 class URLCache:
     def __init__(
@@ -58,7 +60,7 @@ class URLCache:
         loglevel: int = DEFAULT_LOGLEVEL,
         sleep_time: int = DEFAULT_SLEEP_TIME,
         additional_extractors: Optional[List[Any]] = None,
-        file_parsers: Optional[List[FileParser]] = None,
+        file_parsers: Optional[List[FileParser[T]]] = None,
         options: Optional[Options] = None,
     ) -> None:
         """
@@ -112,7 +114,9 @@ class URLCache:
         self.expiry_duration: Optional[timedelta] = None
         if self.options["expiry_duration"] is not None:
             assert isinstance(self.options["expiry_duration"], str)
-            self.expiry_duration = parse_timedelta_string(self.options["expiry_duration"])
+            self.expiry_duration = parse_timedelta_string(
+                self.options["expiry_duration"]
+            )
 
         ll: Lassie = Lassie()
         # hackery with a requests.Session to save the most recent request object
@@ -214,7 +218,7 @@ class URLCache:
         return summary
 
     @backoff.on_exception(
-        fibo_backoff, URLCacheRequestException, max_tries=3, on_backoff=backoff_warn
+        fibo_backoff, URLCacheRequestException, max_tries=3, on_backoff=backoff_warn  # type: ignore[arg-type]
     )
     def _fetch_lassie(self, url: str) -> Optional[Json]:
         self.logger.debug("Fetching metadata for {}".format(url))

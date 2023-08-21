@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, TYPE_CHECKING, List
+from typing import Optional, TYPE_CHECKING, List, Any
 from abc import ABC, abstractmethod
 
 from requests import Response
@@ -21,7 +21,7 @@ class AbstractSite(ABC):
     def __init__(self, uc: "URLCache"):
         self._uc = uc
 
-    def file_parsers(self) -> List[FileParser]:
+    def file_parsers(self) -> List[FileParser[Any]]:
         """
         Lets Sites specify custom file parsers dynamically in each Site
         Each Site's file_parsers are added to the URLCache when its instantiated

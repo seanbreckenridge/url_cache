@@ -21,10 +21,10 @@ class SaveSession(Session):
     # type annotations for kwargs must specify kwargs for *one* of the kwargs; quite arbitrarily chosen
     # https://stackoverflow.com/a/37032111/9348376
     # https://github.com/psf/requests/blob/4f6c0187150af09d085c03096504934eb91c7a9e/requests/sessions.py#L626
-    def send(self, request: PreparedRequest, **kwargs: bool) -> Response:
+    def send(self, request: PreparedRequest, **kwargs: bool) -> Response:  # type: ignore[override]
         """
         Save the latest response for a requests.Session
         """
-        resp: Response = super().send(request, **kwargs)  # type: ignore[no-untyped-call]
+        resp: Response = super().send(request, **kwargs)  # type: ignore[no-untyped-call,arg-type]
         self.cb_func(resp)
         return resp

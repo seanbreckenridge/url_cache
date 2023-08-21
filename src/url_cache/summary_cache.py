@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from typing import (
     Optional,
+    Generic,
     List,
     Dict,
     Any,
@@ -21,7 +22,7 @@ from .dir_cache import DirCache
 T = TypeVar("T")
 
 
-class FileParser:
+class FileParser(Generic[T]):
     """
     Encapsulates some function which parses an underlying file for a field on the metadata
     """
@@ -90,7 +91,7 @@ def _dump_file_datetime(data: datetime, p: Path) -> None:
     p.write_text(str(int(data.timestamp())))
 
 
-DEFAULT_FILE_PARSERS: List[FileParser] = [
+DEFAULT_FILE_PARSERS: List[FileParser[Any]] = [
     FileParser(
         name="metadata",
         ext=".json",
@@ -127,15 +128,15 @@ class SummaryDirCache:
     """
 
     def __init__(
-        self, data_dir: Path, *, file_parsers: Optional[List[FileParser]] = None
+        self, data_dir: Path, *, file_parsers: Optional[List[FileParser[Any]]] = None
     ):
         self.data_dir: Path = data_dir
         self.dir_cache = DirCache(str(self.data_dir))
-        self.file_parsers: List[FileParser] = DEFAULT_FILE_PARSERS
+        self.file_parsers: List[FileParser[Any]] = DEFAULT_FILE_PARSERS
         if file_parsers is not None:
             self.file_parsers.extend(file_parsers)
         # map name of attribute to the parsers
-        self.attr_file_parsers: Dict[str, FileParser] = {
+        self.attr_file_parsers: Dict[str, FileParser[Any]] = {
             parser.name: parser for parser in self.file_parsers
         }
 
@@ -202,7 +203,6 @@ class SummaryDirCache:
         key: Path = Path(skey)
 
         for attr in SUMMARY_ATTRS:
-
             # get the value from the Summary dataclass
             val: Optional[Any] = getattr(data, attr, None)
             if val is None:

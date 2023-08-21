@@ -51,7 +51,7 @@ class Youtube(AbstractSite):
     Youtube site extractor to get subtitles for videos
     """
 
-    def file_parsers(self) -> List[FileParser]:
+    def file_parsers(self) -> List[FileParser[str]]:
         return [
             FileParser(
                 name="subtitles",
@@ -79,7 +79,9 @@ class Youtube(AbstractSite):
                     yt_id, self._uc.options["subtitle_language"]
                 )
                 self.sleep()
-            except YoutubeSubtitlesException as ye:  # this catches both request and track/subtitle exceptions
+            except (
+                YoutubeSubtitlesException
+            ) as ye:  # this catches both request and track/subtitle exceptions
                 self.logger.debug(str(ye))
                 # sleep even if it failed to parse, still made the request to youtube
                 # won't sleep if url doesn't match youtube
