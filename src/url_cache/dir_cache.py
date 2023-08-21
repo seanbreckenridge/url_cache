@@ -4,7 +4,6 @@ An hash-based, file system cache
 
 import os
 import shutil
-from functools import lru_cache
 from typing import List
 from hashlib import md5
 
@@ -130,7 +129,6 @@ class DirCache:
         except DirCacheMiss:
             return False
 
-    @lru_cache(32)
     def base_dir_hashed_path(self, key: str) -> str:
         """
         Receives the key as input. Computes the corresponding base directory for the hash
