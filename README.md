@@ -2,6 +2,8 @@
 
 This is currently very alpha and in development, so expect changes to the API/interface. It aims to walk the line between extracting enough text/data for it to be useful, but no so much that it takes enormous amounts of space.
 
+As it stands I'm sort of pessimistic this would ever be a silver bullet, getting useful info out of arbitrary HTML is hard, so you're sort of stuck writing parsers for each website you're interested in. However, I still use this frequently, especially as a cache for API information like described [below](#api-cache-examples)
+
 Current TODOs:
 
 - [ ] Add more sites using the [abstract interface](https://github.com/seanbreckenridge/url_cache/blob/master/src/url_cache/sites/abstract.py), to get more info from sites I use commonly. Ideally, should be able to re-use common scraper/parsers/API interface libraries in python, instead of recreating everything from scratch
@@ -100,10 +102,13 @@ Commands:
 
 An environment variable `URL_CACHE_DIR` can be set, which changes the default cache directory.
 
+### API Cache Examples
+
 I've also successfully used this to cache responses from API results in some of my projects, by subclassing and overriding the `request_data` function. I just make a request and return a summary, and it transparently caches the rest. See:
 
 - [`albums/discogs_cache`](https://github.com/seanbreckenridge/albums/blob/9d296c4abb8e9e16c8dd410aeae8e5bb760008de/nextalbums/discogs_cache.py)
 - [`my_feed/tmdb`](https://github.com/seanbreckenridge/my_feed/blob/master/src/my_feed/sources/trakt/tmdb.py)
+- [`dbsentinel/metadata`](https://github.com/seanbreckenridge/dbsentinel/blob/accfc70485644d8966a582204c6c47839d2d874e/mal_id/metadata_cache.py)
 
 ### CLI Examples
 
