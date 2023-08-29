@@ -4,7 +4,7 @@ from setuptools import setup, find_namespace_packages
 pkg = "url_cache"
 setup(
     name=pkg,
-    version="0.0.7",
+    version="0.0.8",
     url="https://github.com/seanbreckenridge/url_cache",
     author="Sean Breckenridge",
     author_email="seanbrecke@gmail.com",
