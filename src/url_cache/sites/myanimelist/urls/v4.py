@@ -8,7 +8,6 @@ and creates the corresponding URLs to request for Jikan
 
 import re
 from typing import Optional, List, NamedTuple
-from functools import lru_cache
 
 from urllib.parse import urlparse, parse_qs, ParseResult
 
@@ -153,7 +152,6 @@ class Version4:
             ],
         )
 
-    @lru_cache(maxsize=2048)
     def parse_url(self, url: str) -> Optional[MalParseResult]:
         """
         Given a URL, if extra information can be extracted by requesting info from Jikan

@@ -1,6 +1,5 @@
 from typing import Optional
 from urllib.parse import urlparse
-from functools import lru_cache
 
 from .abstract import AbstractSite
 
@@ -11,7 +10,6 @@ class StackOverflow(AbstractSite):
     StackOverflow extractor to normalize question IDs/extract question/answers
     """
 
-    @lru_cache(maxsize=32)
     def extract_question_id(self, url: str) -> Optional[int]:
         """
         Extract a stackoverflow question ID from a URL
