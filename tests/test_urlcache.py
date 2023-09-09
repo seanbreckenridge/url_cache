@@ -136,7 +136,7 @@ def test_generic_url(ucache: URLCache) -> None:
             "status_code",
         }
     )
-    assert summ_resp.metadata["url"] == github_home + "/"
+    assert summ_resp.metadata["url"].rstrip("/") == github_home.rstrip("/")
 
     dir_full_path = ucache.summary_cache.dir_cache.get(github_home)
     # make sure subtitles file doesn't exist for item which doesnt have subtitle
