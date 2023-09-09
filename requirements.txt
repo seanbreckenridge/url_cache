@@ -1,5 +1,5 @@
 appdirs>=1.4.4
-lassie>=0.11.9
+lassie>=0.11.11
 readability-lxml>=0.8.1
 backoff>=1.10.0
 click>=7.1.2

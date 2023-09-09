@@ -118,7 +118,25 @@ def test_generic_url(ucache: URLCache) -> None:
     assert isinstance(summ_resp.timestamp, datetime)
     assert "subtitles" not in summ_resp.data
     assert summ_resp.metadata is not None
-    assert summ_resp.metadata["title"].casefold().startswith("github")
+
+    assert list(summ_resp.data.keys()) == []
+
+    # hmm, seems to be different based on python version?
+    # dont know why
+    assert set(summ_resp.metadata.keys()).issubset(
+        {
+            "images",
+            "videos",
+            "site_name",
+            "title",
+            "url",
+            "description",
+            "locale",
+            "html",
+            "status_code",
+        }
+    )
+    assert summ_resp.metadata["url"].rstrip("/") == github_home.rstrip("/")
 
     dir_full_path = ucache.summary_cache.dir_cache.get(github_home)
     # make sure subtitles file doesn't exist for item which doesnt have subtitle
