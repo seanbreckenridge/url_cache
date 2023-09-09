@@ -64,9 +64,31 @@ class FileParser(Generic[T]):
 # functions to load/dump the supported types from files
 
 
-def _load_file_json(p: Path) -> Json:
-    loaded: Json = json.loads(p.read_text())
-    return loaded
+# speedup json functions if orjson is available
+try:
+    import orjson  # type: ignore[import]
+
+    def _load_file_json(p: Path) -> Json:
+        loaded: Json = orjson.loads(p.read_text())
+        return loaded
+
+    def _dump_file_json(data: Json, p: Path) -> None:
+        # if the file doesnt exist, don't write anything
+        # will default to {} when constructing later, so is a useless file
+        if data == {}:
+            return
+        p.write_bytes(orjson.dumps(data))
+
+except ModuleNotFoundError:
+
+    def _load_file_json(p: Path) -> Json:
+        loaded: Json = json.loads(p.read_text())
+        return loaded
+
+    def _dump_file_json(data: Json, p: Path) -> None:
+        if data == {}:
+            return
+        p.write_text(json.dumps(data))
 
 
 def _load_file_text(p: Path) -> str:
@@ -75,12 +97,6 @@ def _load_file_text(p: Path) -> str:
 
 def _load_file_datetime(p: Path) -> datetime:
     return datetime.fromtimestamp(int(p.read_text()))
-
-
-def _dump_file_json(data: Json, p: Path) -> None:
-    if data == {}:
-        return
-    p.write_text(json.dumps(data))
 
 
 def _dump_file_text(data: str, p: Path) -> None:

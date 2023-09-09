@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from pathlib import Path
@@ -25,7 +26,6 @@ image_file = "https://i.picsum.photos/id/1000/367/267.jpg?hmac=uO9iQNujyGpqk0Iey
 @pytest.mark.skip(reason="pytube subtitles is broken, waiting on fix")
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_subs.yaml"))  # type: ignore
 def test_youtube_has_subtitles(ucache: URLCache) -> None:
-
     # make sure subtitles download to file
     assert not ucache.in_cache(youtube_with_cc)
     summ_resp: Summary = ucache.get(youtube_with_cc)
@@ -72,6 +72,10 @@ def test_doesnt_have_subtitles(ucache: URLCache) -> None:
     )
     assert not os.path.exists(os.path.join(dir_full_path, "data", "subtitles.srt"))
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
+    with open(os.path.join(dir_full_path, "metadata.json")) as f:
+        metadata = json.loads(f.read())
+        assert metadata["images"] == summ_resp.metadata["images"]
+
     # this deletes the summary files on purpose, since theyre somewhat useless
     assert not os.path.exists(os.path.join(dir_full_path, "html_summary.html"))
 
@@ -82,7 +86,6 @@ skip_dl_fp = os.path.join(tests_dir, "vcr/skip_downloading_youtube_subtitles.yam
 @pytest.mark.skip(reason="pytube subtitles is broken, waiting on fix")
 @vcr.use_cassette(skip_dl_fp)  # type: ignore
 def test_skip_downloading_youtube_subtitles(ucache: URLCache) -> None:
-
     # see if this URL would succeed usually, download subtitles
     assert not ucache.in_cache(youtube_with_cc_skip_subs)
     summ_resp = ucache.get(youtube_with_cc_skip_subs)
@@ -130,7 +133,6 @@ def test_generic_url(ucache: URLCache) -> None:
 
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/test_image.yaml"))  # type: ignore
 def test_image(ucache: URLCache) -> None:
-
     summ_resp = ucache.get(image_file)
     assert ucache.in_cache(image_file)
 
