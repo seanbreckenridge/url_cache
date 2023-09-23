@@ -48,7 +48,7 @@ Classes
         json file and no srt data), then return True
         else return False (this has data)
         
-        meant to be used to 'retry' getting url metadata, incase none was retrieved
+        meant to be used to 'retry' getting url metadata, in case none was retrieved
 
     `parse_file(self, p: pathlib.Path) ‑> Tuple[str, Any]`
     :   Takes a path and tries to parse it with each self.file_parsers

@@ -73,7 +73,7 @@ try:
         return loaded
 
     def _dump_file_json(data: Json, p: Path) -> None:
-        # if the file doesnt exist, don't write anything
+        # if the file doesn't exist, don't write anything
         # will default to {} when constructing later, so is a useless file
         if data == {}:
             return
@@ -250,7 +250,7 @@ class SummaryDirCache:
         json file and no srt data), then return True
         else return False (this has data)
 
-        meant to be used to 'retry' getting url metadata, incase none was retrieved
+        meant to be used to 'retry' getting url metadata, in case none was retrieved
         """
         # TODO: implement? may not be needed
         raise NotImplementedError

@@ -6,7 +6,7 @@ As it stands I'm sort of pessimistic this would ever be a silver bullet, getting
 
 Current TODOs:
 
-- [ ] Add more sites using the [abstract interface](https://github.com/seanbreckenridge/url_cache/blob/master/src/url_cache/sites/abstract.py), to get more info from sites I use commonly. Ideally, should be able to re-use common scraper/parsers/API interface libraries in python, instead of recreating everything from scratch
+- [ ] Add more sites using the [abstract interface](https://github.com/seanbreckenridge/url_cache/blob/master/src/url_cache/sites/abstract.py), to get more info from sites I use commonly. Ideally, should be able to reuse common scraper/parsers/API interface libraries in python, instead of recreating everything from scratch
 - [ ] Create a (separate repo/project) daemon which handles configuring this and slowly requests things in the background as they become available through given sources; allow user to provide generators/inputs define include/exclude lists/regexes. Probably just integrate with [promnesia](https://github.com/karlicoss/promnesia) so avoid duplicating the work of searching for URLs on disk
 
 ## Installation

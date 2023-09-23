@@ -59,7 +59,7 @@ class Version4:
     """
     Converts MyAnimeList URLs to their corresponding Jikan counterparts.
 
-    Only supports a subset of the URLs -- this doesnt support user lists
+    Only supports a subset of the URLs -- this doesn't support user lists
     or pages that change very often (searches, seasonal listings, history pages)
     as it wouldn't be as useful to cache those
     """

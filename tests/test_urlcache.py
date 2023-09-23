@@ -59,7 +59,7 @@ def test_youtube_preprocessor(ucache: URLCache) -> None:
 @vcr.use_cassette(os.path.join(tests_dir, "vcr/youtube_no_subs.yaml"))  # type: ignore
 def test_doesnt_have_subtitles(ucache: URLCache) -> None:
     summ_resp = ucache.get(youtube_without_cc)
-    # shouldnt match, is the 'corrected' preprocessed URL
+    # shouldn't match, is the 'corrected' preprocessed URL
     assert summ_resp.url != youtube_without_cc
     # make sure this parsed the youtube id
     assert "xvQUiX26RfE" == get_yt_video_id(youtube_without_cc)
@@ -76,7 +76,7 @@ def test_doesnt_have_subtitles(ucache: URLCache) -> None:
         metadata = json.loads(f.read())
         assert metadata["images"] == summ_resp.metadata["images"]
 
-    # this deletes the summary files on purpose, since theyre somewhat useless
+    # this deletes the summary files on purpose, since they're somewhat useless
     assert not os.path.exists(os.path.join(dir_full_path, "html_summary.html"))
 
 
@@ -103,7 +103,7 @@ def test_skip_downloading_youtube_subtitles(ucache: URLCache) -> None:
 
     ucache.options["skip_subtitles"] = True
 
-    # make sure we didnt get any subtitles
+    # make sure we didn't get any subtitles
     summ_resp = ucache.get(youtube_with_cc_skip_subs)
     assert "subtitles" not in summ_resp.data
 
@@ -139,12 +139,12 @@ def test_generic_url(ucache: URLCache) -> None:
     assert summ_resp.metadata["url"].rstrip("/") == github_home.rstrip("/")
 
     dir_full_path = ucache.summary_cache.dir_cache.get(github_home)
-    # make sure subtitles file doesn't exist for item which doesnt have subtitle
+    # make sure subtitles file doesn't exist for item which doesn't have subtitle
     assert not os.path.exists(os.path.join(dir_full_path, "data", "subtitles.srt"))
     assert os.path.exists(os.path.join(dir_full_path, "metadata.json"))
     assert os.path.exists(os.path.join(dir_full_path, "html_summary.html"))
     assert os.path.exists(os.path.join(dir_full_path, "timestamp.datetime.txt"))
-    # url file shouldnt exist, that is stored in key
+    # url file shouldn't exist, that is stored in key
     assert not os.path.exists(os.path.join(dir_full_path, "url.txt"))
     assert os.path.exists(os.path.join(dir_full_path, "key"))
 
@@ -155,7 +155,7 @@ def test_image(ucache: URLCache) -> None:
     assert ucache.in_cache(image_file)
 
     # assert Summary values
-    assert summ_resp.html_summary is None  # shouldnt have any HTML
+    assert summ_resp.html_summary is None  # shouldn't have any HTML
     assert "subtitles" not in summ_resp.data  # no subtitles, obviously
     imgs: List[Dict[str, Any]] = summ_resp.metadata["images"]
     assert len(imgs) == 1

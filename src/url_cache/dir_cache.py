@@ -92,7 +92,7 @@ class DirCache:
             target_key = os.path.join(s, "key")
             if os.path.exists(target_key) and keyfile_matches_contents(key, target_key):
                 return s
-        # if keyfile didnt match an existing one, put it in the first 'open' directory
+        # if keyfile didn't match an existing one, put it in the first 'open' directory
         # in this folder. Most of the time, this will be unique and just return
         # ../000/
         i = 0
